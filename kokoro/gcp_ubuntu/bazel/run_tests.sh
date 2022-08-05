@@ -43,4 +43,4 @@ cp "WORKSPACE" "WORKSPACE.bak"
   -f "WORKSPACE" \
   -t "${TINK_BASE_DIR}"
 ./kokoro/testutils/run_bazel_tests.sh .
-cp "WORKSPACE.bak" "WORKSPACE"
+mv "WORKSPACE.bak" "WORKSPACE"
