@@ -17,24 +17,18 @@
 set -euo pipefail
 
 if [[ -n "${KOKORO_ROOT:-}" ]] ; then
-  cd "${KOKORO_ARTIFACTS_DIR}/git/tink_java_apps"
+  TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
+  cd "${TINK_BASE_DIR}/tink_java_apps"
   use_bazel.sh "$(cat .bazelversion)"
 fi
 
-# When running on the Kokoro CI, we expect these folders to exist:
-#
-#  ${KOKORO_ARTIFACTS_DIR}/git/tink_java
-#  ${KOKORO_ARTIFACTS_DIR}/git/tink_java_apps
-#
-# If this is not the case, we are using this script locally for a manual one-off
-# test (running it from the root of a local copy of the tink-java-apps repo).
-: "${TINK_BASE_DIR:=$(pwd)/..}"
+: "${TINK_BASE_DIR:=$(cd .. && pwd)}"
 
-# If tink-go is not in TINK_BASE_DIR we clone it from GitHub.
-if [[ ! -d "${TINK_BASE_DIR}/tink_java" ]]; then
-  git clone https://github.com/tink-crypto/tink-java.git \
-    "${TINK_BASE_DIR}/tink_java"
-fi
+# Check for dependencies in TINK_BASE_DIR. Any that aren't present will be
+# downloaded.
+readonly GITHUB_ORG="https://github.com/tink-crypto"
+./kokoro/testutils/fetch_git_repo_if_not_present.sh "${TINK_BASE_DIR}" \
+  "${GITHUB_ORG}/tink-java"
 
 source ./kokoro/testutils/install_python3.sh
 ./kokoro/testutils/update_android_sdk.sh
