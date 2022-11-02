@@ -38,7 +38,6 @@ readonly GITHUB_ORG="https://github.com/tink-crypto"
 ./kokoro/testutils/update_android_sdk.sh
 cp "WORKSPACE" "WORKSPACE.bak"
 ./kokoro/testutils/replace_http_archive_with_local_repository.py \
-  -f "WORKSPACE" \
-  -t "${TINK_BASE_DIR}"
+  -f "WORKSPACE" -t "${TINK_BASE_DIR}"
 ./kokoro/testutils/run_bazel_tests.sh .
 mv "WORKSPACE.bak" "WORKSPACE"
