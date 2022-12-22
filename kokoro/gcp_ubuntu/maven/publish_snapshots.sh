@@ -32,9 +32,10 @@ fi
 
 # TODO(b/263465812): Add test example app for testing the Maven snapshots.
 
+readonly GITHUB_JOB_NAME="tink/github/java_apps/gcp_ubuntu/maven/continuous"
+
 if [[ "${IS_KOKORO}" == "true" \
       && "${KOKORO_JOB_NAME}" == "${GITHUB_JOB_NAME}" ]] ; then
-  readonly GITHUB_JOB_NAME="tink/github/java_apps/gcp_ubuntu/maven/continuous"
   # GITHUB_ACCESS_TOKEN is populated by Kokoro.
   readonly GIT_CREDENTIALS="ise-crypto:${GITHUB_ACCESS_TOKEN}"
   readonly GITHUB_URL="https://${GIT_CREDENTIALS}@github.com/tink-crypto/tink-java-apps.git"
