@@ -331,8 +331,9 @@ public&nbsp;<a href="../../../../../../com/google/crypto/tink/apps/paymentmethod
 <ul class="blockList">
 <li class="blockList">
 <h4>senderIntermediateSigningKey</h4>
-<pre>public&nbsp;<a href="../../../../../../com/google/crypto/tink/apps/paymentmethodtoken/PaymentMethodTokenSender.Builder.html" title="class in com.google.crypto.tink.apps.paymentmethodtoken">PaymentMethodTokenSender.Builder</a>&nbsp;senderIntermediateSigningKey(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;val)
-                                                              throws <a href="https://docs.oracle.com/javase/8/docs/api/java/security/GeneralSecurityException.html?is-external=true" title="class or interface in java.security">GeneralSecurityException</a></pre>
+<pre>@CanIgnoreReturnValue
+public&nbsp;<a href="../../../../../../com/google/crypto/tink/apps/paymentmethodtoken/PaymentMethodTokenSender.Builder.html" title="class in com.google.crypto.tink.apps.paymentmethodtoken">PaymentMethodTokenSender.Builder</a>&nbsp;senderIntermediateSigningKey(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;val)
+                                                                                    throws <a href="https://docs.oracle.com/javase/8/docs/api/java/security/GeneralSecurityException.html?is-external=true" title="class or interface in java.security">GeneralSecurityException</a></pre>
 <div class="block">Sets the intermediate signing key of the sender.
 
  <p>It must be base64 encoded PKCS8 private key.</div>
