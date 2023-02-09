@@ -60,15 +60,17 @@ readonly GITHUB_RELEASE_OPTS
 
 # If running on Kokoro, TMPDIR is populated with the tmp folder.
 readonly TMP_FOLDER="$(mktemp -d "${TMPDIR}/release_XXXXXX")"
-readonly RELEASE_SCRIPT="$(pwd)/kokoro/testutils/create_github_release.sh"
-if [[ ! -f "${RELEASE_SCRIPT}" ]]; then
-  echo "${RELEASE_SCRIPT} not found."
+readonly RELEASE_UTIL_SCRIPT="$(pwd)/kokoro/testutils/github_release_util.sh"
+if [[ ! -f "${RELEASE_UTIL_SCRIPT}" ]]; then
+  echo "${RELEASE_UTIL_SCRIPT} not found."
   echo "Make sure you run this script from the root of tink-java-apps."
   return 1
 fi
 
 pushd "${TMP_FOLDER}"
 # Create a GitHub release branch/tag.
-"${RELEASE_SCRIPT}" "${github_release_opt[@]}" "${RELEASE_VERSION}" \
-  tink-java-apps
+"${RELEASE_UTIL_SCRIPT}" create_branch "${github_release_opt[@]}" \
+  "${RELEASE_VERSION}" tink-java-apps
+"${RELEASE_UTIL_SCRIPT}" create_tag "${github_release_opt[@]}" \
+  "${RELEASE_VERSION}" tink-java-apps
 popd
