@@ -40,13 +40,11 @@ if [[ ! "${DO_MAKE_RELEASE}" =~ ^(false|true)$ ]]; then
   exit 1
 fi
 
-###################### Perform a GitHub release. ######################
-
-GITHUB_RELEASE_OPTS=()
+GITHUB_RELEASE_UTIL_OPTS=()
 if [[ "${IS_KOKORO}" == "true" ]] ; then
   # Note: KOKORO_GIT_COMMIT_tink_java_apps and GITHUB_ACCESS_TOKEN are populated
   # by Kokoro.
-  GITHUB_RELEASE_OPTS+=(
+  GITHUB_RELEASE_UTIL_OPTS+=(
     -c "${KOKORO_GIT_COMMIT_tink_java_apps}"
     -t "${GITHUB_ACCESS_TOKEN}"
   )
@@ -54,23 +52,20 @@ if [[ "${IS_KOKORO}" == "true" ]] ; then
   cd "${TINK_BASE_DIR}/tink_java_apps"
 fi
 if [[ "${DO_MAKE_RELEASE}" == "true" ]]; then
-  GITHUB_RELEASE_OPTS+=( -r )
+  GITHUB_RELEASE_UTIL_OPTS+=( -r )
 fi
-readonly GITHUB_RELEASE_OPTS
+readonly GITHUB_RELEASE_UTIL_OPTS
 
 # If running on Kokoro, TMPDIR is populated with the tmp folder.
 readonly TMP_FOLDER="$(mktemp -d "${TMPDIR}/release_XXXXXX")"
 readonly RELEASE_UTIL_SCRIPT="$(pwd)/kokoro/testutils/github_release_util.sh"
 if [[ ! -f "${RELEASE_UTIL_SCRIPT}" ]]; then
-  echo "${RELEASE_UTIL_SCRIPT} not found."
-  echo "Make sure you run this script from the root of tink-java-apps."
-  return 1
+  echo "${RELEASE_UTIL_SCRIPT} not found." >&2
+  echo "Make sure you run this script from the root of tink-java-apps." >&2
+  exit 1
 fi
 
 pushd "${TMP_FOLDER}"
-# Create a GitHub release branch/tag.
-"${RELEASE_UTIL_SCRIPT}" create_branch "${github_release_opt[@]}" \
-  "${RELEASE_VERSION}" tink-java-apps
-"${RELEASE_UTIL_SCRIPT}" create_tag "${github_release_opt[@]}" \
+"${RELEASE_UTIL_SCRIPT}" "${GITHUB_RELEASE_UTIL_OPTS[@]}" create_tag \
   "${RELEASE_VERSION}" tink-java-apps
 popd
