@@ -15,6 +15,8 @@ Tink (Bazel) | [![Bazel_GcpUbuntu][tink_java_apps_bazel_badge_gcp_ubuntu]](#) | 
 This repository contains extensions and applications of the
 [Tink Java](https://github.com/tink-crypto/tink-java) library.
 
+The latest version is 1.8.0.
+
 The official documentation is available at https://developers.google.com/tink.
 
 ## Contact and mailing list
