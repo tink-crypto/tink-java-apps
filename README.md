@@ -13,11 +13,98 @@
 Tink (Bazel) | [![Bazel_GcpUbuntu][tink_java_apps_bazel_badge_gcp_ubuntu]](#) | [![Bazel_MacOs][tink_java_apps_bazel_badge_macos]](#)
 
 This repository contains extensions and applications of the
-[Tink Java](https://github.com/tink-crypto/tink-java) library.
+[Tink Java](https://github.com/tink-crypto/tink-java) library:
 
-The latest version is 1.8.0.
+*   `apps-paymentmethodtoken`: An implementation of
+    [Google Payment Method Token](https://developers.google.com/pay/api/payment-data-cryptography)
+*   `apps-rewardedads`: An implementation of the verifier side of
+    [Server-Side Verification of Google AdMob Rewarded Ads](https://developers.google.com/admob/android/ssv)
+*   `apps-webpush`: An implementation of
+    [RFC 8291 - Message Encryption for Web Push](https://www.rfc-editor.org/rfc/rfc8291)
 
-The official documentation is available at https://developers.google.com/tink.
+The latest version of these applications is 1.8.0.
+
+The official Tink documentation is available at
+https://developers.google.com/tink.
+
+### apps-paymentmethodtoken
+
+You can add this library as a Maven dependency:
+
+```xml
+<dependency>
+  <groupId>com.google.crypto.tink</groupId>
+  <artifactId>apps-paymentmethodtoken</artifactId>
+  <version>1.8.0</version>
+</dependency>
+```
+
+The Javadoc for the latest release can be found
+[here](https://tink-crypto.github.io/tink-java-apps/javadoc/apps-paymentmethodtoken/1.8.0/).
+
+### apps-rewardedads
+
+You can add this library as a Maven dependency:
+
+```xml
+<dependency>
+  <groupId>com.google.crypto.tink</groupId>
+  <artifactId>apps-rewardedads</artifactId>
+  <version>1.8.0</version>
+</dependency>
+```
+
+The Javadoc for the latest release can be found
+[here](https://tink-crypto.github.io/tink-java-apps/javadoc/apps-rewardedads/1.8.0/).
+
+### apps-webpush
+
+You can add this library as a Maven dependency:
+
+```xml
+<dependency>
+  <groupId>com.google.crypto.tink</groupId>
+  <artifactId>apps-webpush</artifactId>
+  <version>1.8.0</version>
+</dependency>
+```
+
+The Javadoc for the latest release can be found
+[here](https://tink-crypto.github.io/tink-java-apps/javadoc/apps-webpush/1.8.0/).
+
+You can encrypt a plaintext as follows:
+
+```java
+import com.google.crypto.tink.HybridEncrypt;
+import java.security.interfaces.ECPublicKey;
+
+ECPublicKey reicipientPublicKey = ...;
+byte[] authSecret = ...;
+HybridEncrypt hybridEncrypt = new WebPushHybridEncrypt.Builder()
+     .withAuthSecret(authSecret)
+     .withRecipientPublicKey(recipientPublicKey)
+     .build();
+byte[] plaintext = ...;
+byte[] ciphertext = hybridEncrypt.encrypt(plaintext, null /* contextInfo, must be null */);
+```
+
+To decrypt:
+
+```java
+import com.google.crypto.tink.HybridDecrypt;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+
+ECPrivateKey recipientPrivateKey = ...;
+ECPublicKey  recipientPublicKey = ...;
+HybridDecrypt hybridDecrypt = new WebPushHybridDecrypt.Builder()
+     .withAuthSecret(authSecret)
+     .withRecipientPublicKey(recipientPublicKey)
+     .withRecipientPrivateKey(recipientPrivateKey)
+     .build();
+byte[] ciphertext = ...;
+byte[] plaintext = hybridDecrypt.decrypt(ciphertext, /* contextInfo, must be null */);
+```
 
 ## Contact and mailing list
 
