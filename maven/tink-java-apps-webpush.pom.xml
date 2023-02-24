@@ -85,10 +85,16 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <tink.version>1.7.0</tink.version>
+    <error_prone_annotations.version>2.16</error_prone_annotations.version>
+    <tink.version>1.8.0</tink.version>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>com.google.errorprone</groupId>
+      <artifactId>error_prone_annotations</artifactId>
+      <version>${error_prone_annotations.version}</version>
+    </dependency>
     <dependency>
       <groupId>com.google.crypto.tink</groupId>
       <artifactId>tink</artifactId>
