@@ -67,7 +67,7 @@
 <!--   -->
 </a></div>
 <!-- ========= END OF TOP NAVBAR ========= -->
-<div class="contentContainer"><a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a name="I:A">
+<div class="contentContainer"><a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a name="I:A">
 <!--   -->
 </a>
 <h2 class="title">A</h2>
@@ -168,6 +168,16 @@
 <dd>
 <div class="block">Fetches verifying public keys of the sender using <a href="com/google/crypto/tink/apps/paymentmethodtoken/GooglePaymentsPublicKeysManager.html" title="class in com.google.crypto.tink.apps.paymentmethodtoken"><code>GooglePaymentsPublicKeysManager</code></a>.</div>
 </dd>
+<dt><span class="memberNameLink"><a href="com/google/crypto/tink/apps/paymentmethodtoken/JwtKeyConverter.html#fromBase64EncodedNistP256PublicKey-java.lang.String-">fromBase64EncodedNistP256PublicKey(String)</a></span> - Static method in class com.google.crypto.tink.apps.paymentmethodtoken.<a href="com/google/crypto/tink/apps/paymentmethodtoken/JwtKeyConverter.html" title="class in com.google.crypto.tink.apps.paymentmethodtoken">JwtKeyConverter</a></dt>
+<dd>
+<div class="block">Converts an uncompressed Base64 encoded ECDSA public key for NIST P-256 Curve into a Tink
+ JwtEcdsaPublicKey with algorithm ES256.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/google/crypto/tink/apps/paymentmethodtoken/JwtKeyConverter.html#fromBased64EncodedPkcs8EcNistP256PrivateKey-java.lang.String-com.google.crypto.tink.jwt.JwtEcdsaPublicKey-com.google.crypto.tink.SecretKeyAccess-">fromBased64EncodedPkcs8EcNistP256PrivateKey(String, JwtEcdsaPublicKey, SecretKeyAccess)</a></span> - Static method in class com.google.crypto.tink.apps.paymentmethodtoken.<a href="com/google/crypto/tink/apps/paymentmethodtoken/JwtKeyConverter.html" title="class in com.google.crypto.tink.apps.paymentmethodtoken">JwtKeyConverter</a></dt>
+<dd>
+<div class="block">Converts a Base64 encoded PKCS8 ECDSA private key for NIST P-256 Curve into a Tink
+ JwtEcdsaPrivateKey with algorithm ES256.</div>
+</dd>
 </dl>
 <a name="I:G">
 <!--   -->
@@ -195,6 +205,16 @@
 <dt><span class="memberNameLink"><a href="com/google/crypto/tink/apps/paymentmethodtoken/GooglePaymentsPublicKeysManager.html#INSTANCE_TEST">INSTANCE_TEST</a></span> - Static variable in class com.google.crypto.tink.apps.paymentmethodtoken.<a href="com/google/crypto/tink/apps/paymentmethodtoken/GooglePaymentsPublicKeysManager.html" title="class in com.google.crypto.tink.apps.paymentmethodtoken">GooglePaymentsPublicKeysManager</a></dt>
 <dd>
 <div class="block">Instance configured to talk to fetch keys from test environment (from <a href="com/google/crypto/tink/apps/paymentmethodtoken/GooglePaymentsPublicKeysManager.html#KEYS_URL_TEST"><code>GooglePaymentsPublicKeysManager.KEYS_URL_TEST</code></a>).</div>
+</dd>
+</dl>
+<a name="I:J">
+<!--   -->
+</a>
+<h2 class="title">J</h2>
+<dl>
+<dt><a href="com/google/crypto/tink/apps/paymentmethodtoken/JwtKeyConverter.html" title="class in com.google.crypto.tink.apps.paymentmethodtoken"><span class="typeNameLink">JwtKeyConverter</span></a> - Class in <a href="com/google/crypto/tink/apps/paymentmethodtoken/package-summary.html">com.google.crypto.tink.apps.paymentmethodtoken</a></dt>
+<dd>
+<div class="block">Functions that convert raw keys into Tink JWT Signature keys.</div>
 </dd>
 </dl>
 <a name="I:K">
@@ -359,6 +379,17 @@
 <dt><span class="memberNameLink"><a href="com/google/crypto/tink/apps/paymentmethodtoken/GooglePaymentsPublicKeysManager.Builder.html#setKeysUrl-java.lang.String-">setKeysUrl(String)</a></span> - Method in class com.google.crypto.tink.apps.paymentmethodtoken.<a href="com/google/crypto/tink/apps/paymentmethodtoken/GooglePaymentsPublicKeysManager.Builder.html" title="class in com.google.crypto.tink.apps.paymentmethodtoken">GooglePaymentsPublicKeysManager.Builder</a></dt>
 <dd>&nbsp;</dd>
 </dl>
+<a name="I:T">
+<!--   -->
+</a>
+<h2 class="title">T</h2>
+<dl>
+<dt><span class="memberNameLink"><a href="com/google/crypto/tink/apps/paymentmethodtoken/JwtKeyConverter.html#toBase64EncodedNistP256PublicKey-com.google.crypto.tink.jwt.JwtEcdsaPublicKey-">toBase64EncodedNistP256PublicKey(JwtEcdsaPublicKey)</a></span> - Static method in class com.google.crypto.tink.apps.paymentmethodtoken.<a href="com/google/crypto/tink/apps/paymentmethodtoken/JwtKeyConverter.html" title="class in com.google.crypto.tink.apps.paymentmethodtoken">JwtKeyConverter</a></dt>
+<dd>
+<div class="block">Converts a JwtEcdsaPublicKey using algorithm ES256 to an uncompressed Base64 encoded ECDSA
+ public key for NIST P-256 Curve.</div>
+</dd>
+</dl>
 <a name="I:U">
 <!--   -->
 </a>
@@ -370,7 +401,7 @@
  decryption (if required) steps based on the protocolVersion.</div>
 </dd>
 </dl>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:U">U</a>&nbsp;</div>
+<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;</div>
 <!-- ======= START OF BOTTOM NAVBAR ====== -->
 <div class="bottomNav"><a name="navbar.bottom">
 <!--   -->
