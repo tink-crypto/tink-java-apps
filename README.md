@@ -22,7 +22,7 @@ This repository contains extensions and applications of the
 *   `apps-webpush`: An implementation of
     [RFC 8291 - Message Encryption for Web Push](https://www.rfc-editor.org/rfc/rfc8291)
 
-The latest version of these applications is 1.9..
+The latest version of these applications is 1.9.1.
 
 The official Tink documentation is available at
 https://developers.google.com/tink.
