@@ -22,22 +22,10 @@ export ANDROID_HOME="/usr/local/share/android-sdk"
 export COURSIER_OPTS="-Djava.net.preferIPv6Addresses=true"
 
 if [[ -n "${KOKORO_ROOT:-}" ]] ; then
-  TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
+  readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_java_apps"
   export JAVA_HOME=$(/usr/libexec/java_home -v "1.8.0_292")
 fi
 
-: "${TINK_BASE_DIR:=$(cd .. && pwd)}"
-
-# Check for dependencies in TINK_BASE_DIR. Any that aren't present will be
-# downloaded.
-readonly GITHUB_ORG="https://github.com/tink-crypto"
-./kokoro/testutils/fetch_git_repo_if_not_present.sh "${TINK_BASE_DIR}" \
-  "${GITHUB_ORG}/tink-java"
-
 ./kokoro/testutils/update_android_sdk.sh
-cp "WORKSPACE" "WORKSPACE.bak"
-./kokoro/testutils/replace_http_archive_with_local_repository.py \
-  -f "WORKSPACE" -t "${TINK_BASE_DIR}"
 ./kokoro/testutils/run_bazel_tests.sh .
-mv "WORKSPACE.bak" "WORKSPACE"
