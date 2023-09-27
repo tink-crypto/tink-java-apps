@@ -3,6 +3,7 @@
 <!-- GCP Ubuntu --->
 
 [tink_java_apps_bazel_badge_gcp_ubuntu]: https://storage.googleapis.com/tink-kokoro-build-badges/tink-java-apps-bazel-gcp-ubuntu.svg
+[tink_java_apps_maven_badge_gcp_ubuntu]: https://storage.googleapis.com/tink-kokoro-build-badges/tink-java-apps-maven-gcp-ubuntu.svg
 
 <!-- MacOS --->
 
@@ -11,6 +12,7 @@
 **Test**     | **GCP Ubuntu**                                                 | **MacOS**
 ------------ | -------------------------------------------------------------- | ---------
 Tink (Bazel) | [![Bazel_GcpUbuntu][tink_java_apps_bazel_badge_gcp_ubuntu]](#) | [![Bazel_MacOs][tink_java_apps_bazel_badge_macos]](#)
+Maven        | [![Maven_GcpUbuntu][tink_java_apps_maven_badge_gcp_ubuntu]](#) | N/A
 
 This repository contains extensions and applications of the
 [Tink Java](https://github.com/tink-crypto/tink-java) library:
