@@ -85,7 +85,7 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <error_prone_annotations.version>2.18.0</error_prone_annotations.version>
+    <error_prone_annotations.version>2.22.0</error_prone_annotations.version>
     <tink.version>1.11.0</tink.version>
   </properties>
 
