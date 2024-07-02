@@ -1,4 +1,4 @@
-load("@tink_java//tools:gen_java_test_rules.bzl", "gen_java_test_rules")
+load("//tools:gen_java_test_rules.bzl", "gen_java_test_rules")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,14 +16,10 @@ java_library(
         "//rewardedads/src/main/java/com/google/crypto/tink/apps/rewardedads:keys_downloader",
         "//rewardedads/src/main/java/com/google/crypto/tink/apps/rewardedads:rewarded_ads_verifier",
         "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_crypto_tink_tink",
         "@maven//:com_google_errorprone_error_prone_annotations",
         "@maven//:com_google_http_client_google_http_client",
         "@maven//:junit_junit",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:base64",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:ecdsa_sign_jce",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:elliptic_curves",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:enums",
-        "@tink_java//src/main/java/com/google/crypto/tink/util:keys_downloader",
     ],
 )
 

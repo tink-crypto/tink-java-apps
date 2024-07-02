@@ -25,7 +25,6 @@ import com.google.crypto.tink.HybridEncrypt;
 import com.google.crypto.tink.subtle.EllipticCurves;
 import com.google.crypto.tink.subtle.Hex;
 import com.google.crypto.tink.subtle.Random;
-import com.google.crypto.tink.testing.TestUtil;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
@@ -40,6 +39,11 @@ import org.junit.runners.JUnit4;
 /** Unit tests for {@code WebPushHybridEncrypt}. */
 @RunWith(JUnit4.class)
 public class WebPushHybridEncryptTest {
+
+  private static boolean isTsan() {
+    return false;
+  }
+
   @Test
   public void testEncryptDecrypt() throws Exception {
     KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
@@ -67,7 +71,7 @@ public class WebPushHybridEncryptTest {
     Set<String> ephemeralPublicKeys = new TreeSet<>();
     Set<String> payloads = new TreeSet<>();
     int numTests = 100;
-    if (TestUtil.isTsan()) {
+    if (isTsan()) {
       numTests = 5;
     }
     for (int j = 0; j < numTests; j++) {
@@ -106,7 +110,7 @@ public class WebPushHybridEncryptTest {
     byte[] authSecret = Random.randBytes(16);
 
     int numTests = 100;
-    if (TestUtil.isTsan()) {
+    if (isTsan()) {
       numTests = 5;
     }
     // Test with random, valid record sizes.
@@ -241,4 +245,3 @@ public class WebPushHybridEncryptTest {
     }
   }
 }
-

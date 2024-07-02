@@ -20,11 +20,7 @@ java_library(
         ":payment_method_token_recipient_kem",
         ":payment_method_token_util",
         "@maven//:com_google_code_gson_gson",
-        "@tink_java//src/main/java/com/google/crypto/tink:hybrid_decrypt",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:base64",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:bytes",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:elliptic_curves",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:hkdf",
+        "@maven//:com_google_crypto_tink_tink",
     ],
 )
 
@@ -36,12 +32,8 @@ java_library(
         ":payment_method_token_hybrid_encrypt",
         ":payment_method_token_util",
         "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_crypto_tink_tink",
         "@maven//:com_google_errorprone_error_prone_annotations",
-        "@tink_java//src/main/java/com/google/crypto/tink:hybrid_encrypt",
-        "@tink_java//src/main/java/com/google/crypto/tink:public_key_sign",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:base64",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:ecdsa_sign_jce",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:elliptic_curves",
     ],
 )
 
@@ -50,8 +42,7 @@ java_library(
     srcs = ["PaymentMethodTokenRecipientKeyGen.java"],
     deps = [
         ":payment_method_token_constants",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:base64",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:elliptic_curves",
+        "@maven//:com_google_crypto_tink_tink",
     ],
 )
 
@@ -59,8 +50,7 @@ java_library(
     name = "payment_method_token_constants",
     srcs = ["PaymentMethodTokenConstants.java"],
     deps = [
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:elliptic_curves",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:enums",
+        "@maven//:com_google_crypto_tink_tink",
     ],
 )
 
@@ -76,9 +66,7 @@ java_library(
         ":payment_method_token_constants",
         ":payment_method_token_util",
         "@maven//:com_google_code_gson_gson",
-        "@tink_java//src/main/java/com/google/crypto/tink:hybrid_encrypt",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:base64",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:ecies_hkdf_sender_kem",
+        "@maven//:com_google_crypto_tink_tink",
     ],
 )
 
@@ -92,11 +80,8 @@ java_library(
         ":payment_method_token_recipient_kem",
         ":payment_method_token_util",
         "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_crypto_tink_tink",
         "@maven//:com_google_errorprone_error_prone_annotations",
-        "@tink_java//src/main/java/com/google/crypto/tink:hybrid_decrypt",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:base64",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:ecdsa_verify_jce",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:elliptic_curves",
     ],
 )
 
@@ -107,11 +92,8 @@ java_library(
         ":payment_method_token_constants",
         ":payment_method_token_util",
         "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_crypto_tink_tink",
         "@maven//:com_google_errorprone_error_prone_annotations",
-        "@tink_java//src/main/java/com/google/crypto/tink:public_key_sign",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:base64",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:ecdsa_sign_jce",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:elliptic_curves",
     ],
 )
 
@@ -120,10 +102,7 @@ java_library(
     srcs = ["PaymentMethodTokenUtil.java"],
     deps = [
         ":payment_method_token_constants",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:base64",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:bytes",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:elliptic_curves",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:subtle_util_cluster",
+        "@maven//:com_google_crypto_tink_tink",
     ],
 )
 
@@ -131,14 +110,7 @@ java_library(
     name = "jwt_key_converter",
     srcs = ["JwtKeyConverter.java"],
     deps = [
-        "@tink_java//src/main/java/com/google/crypto/tink:accesses_partial_key",
-        "@tink_java//src/main/java/com/google/crypto/tink:secret_key_access",
-        "@tink_java//src/main/java/com/google/crypto/tink/jwt:jwt_ecdsa_parameters",
-        "@tink_java//src/main/java/com/google/crypto/tink/jwt:jwt_ecdsa_private_key",
-        "@tink_java//src/main/java/com/google/crypto/tink/jwt:jwt_ecdsa_public_key",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:base64",
-        "@tink_java//src/main/java/com/google/crypto/tink/subtle:elliptic_curves",
-        "@tink_java//src/main/java/com/google/crypto/tink/util:secret_big_integer",
+        "@maven//:com_google_crypto_tink_tink",
     ],
 )
 
@@ -146,7 +118,9 @@ java_library(
     name = "keys_downloader",
     srcs = ["KeysDownloader.java"],
     deps = [
+        "@maven//:androidx_annotation_annotation",
         "@maven//:com_google_code_findbugs_jsr305",
+        "@maven//:com_google_crypto_tink_tink",
         "@maven//:com_google_errorprone_error_prone_annotations",
         "@maven//:com_google_http_client_google_http_client",
     ],

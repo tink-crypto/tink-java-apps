@@ -1,4 +1,4 @@
-load("@tink_java//tools:gen_maven_jar_rules.bzl", "gen_maven_jar_rules")
+load("//tools:gen_maven_jar_rules.bzl", "gen_maven_jar_rules")
 
 package(default_visibility = ["//visibility:public"])
 
