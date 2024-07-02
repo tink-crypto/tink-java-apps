@@ -16,16 +16,13 @@
 
 set -euo pipefail
 
-export XCODE_VERSION="14.1"
-export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
-export ANDROID_HOME="/usr/local/share/android-sdk"
-export COURSIER_OPTS="-Djava.net.preferIPv6Addresses=true"
-
 if [[ -n "${KOKORO_ROOT:-}" ]] ; then
   readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_java_apps"
   export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-8-latest/Contents/Home
+  export XCODE_VERSION="14.1"
+  export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
 fi
 
-./kokoro/testutils/update_android_sdk.sh
+source ./kokoro/testutils/update_android_sdk.sh
 ./kokoro/testutils/run_bazel_tests.sh .
