@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.crypto.tink.InsecureSecretKeyAccess;
 import com.google.crypto.tink.KeysetHandle;
+import com.google.crypto.tink.RegistryConfiguration;
 import com.google.crypto.tink.jwt.JwtEcdsaParameters;
 import com.google.crypto.tink.jwt.JwtEcdsaPrivateKey;
 import com.google.crypto.tink.jwt.JwtEcdsaPublicKey;
@@ -77,7 +78,8 @@ public final class JwtKeyConverterTest {
         KeysetHandle.newBuilder()
             .addEntry(KeysetHandle.importKey(jwtEcdsaPrivateKey).makePrimary().withRandomId())
             .build();
-    JwtPublicKeySign signer = privateKeysetHandle.getPrimitive(JwtPublicKeySign.class);
+    JwtPublicKeySign signer =
+        privateKeysetHandle.getPrimitive(RegistryConfiguration.get(), JwtPublicKeySign.class);
     Clock clock = Clock.systemUTC();
     RawJwt rawJwt =
         RawJwt.newBuilder()
@@ -94,7 +96,8 @@ public final class JwtKeyConverterTest {
         KeysetHandle.newBuilder()
             .addEntry(KeysetHandle.importKey(jwtEcdsaPublicKey).makePrimary().withRandomId())
             .build();
-    JwtPublicKeyVerify verifer = publicKeysetHandle.getPrimitive(JwtPublicKeyVerify.class);
+    JwtPublicKeyVerify verifer =
+        publicKeysetHandle.getPrimitive(RegistryConfiguration.get(), JwtPublicKeyVerify.class);
     JwtValidator validator = JwtValidator.newBuilder().expectTypeHeader("JWT").build();
     VerifiedJwt verifiedJwt = verifer.verifyAndDecode(token, validator);
     assertThat(verifiedJwt.getStringClaim("merchantOrigin")).isEqualTo("www.sub-merchant.com");
