@@ -134,7 +134,7 @@ public final class WebPushHybridEncrypt implements HybridEncrypt {
      */
     @CanIgnoreReturnValue
     public Builder withRecordSize(int val) {
-      if (val < WebPushConstants.CIPHERTEXT_OVERHEAD
+      if (val < WebPushConstants.MIN_RS
           || val > WebPushConstants.MAX_CIPHERTEXT_SIZE) {
         throw new IllegalArgumentException(
             String.format(
@@ -216,7 +216,8 @@ public final class WebPushHybridEncrypt implements HybridEncrypt {
       throw new GeneralSecurityException("contextInfo must be null because it is unused");
     }
 
-    if (plaintext.length > recordSize - paddingSize - WebPushConstants.CIPHERTEXT_OVERHEAD) {
+    // rs >= len(plaintext + AES-GCM tag + padding delimiter + padding)
+    if (plaintext.length > recordSize - paddingSize - WebPushConstants.TAG_SIZE - 1) {
       throw new GeneralSecurityException(
           String.format(
               "plaintext too long; with record size = %d and padding size = %d, plaintext cannot"

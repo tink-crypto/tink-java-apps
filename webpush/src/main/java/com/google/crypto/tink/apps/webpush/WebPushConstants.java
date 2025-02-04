@@ -63,6 +63,13 @@ final class WebPushConstants {
   static final int CIPHERTEXT_OVERHEAD =
       CONTENT_CODING_HEADER_SIZE + PADDING_DELIMETER_SIZE + DEFAULT_PADDING_SIZE + TAG_SIZE;
 
+  // https://www.rfc-editor.org/rfc/rfc8188#section-2.1
+  // > rs: Values smaller than 18 are invalid.
+  //
+  // * min data length:   1
+  // * padding delimeter: 1
+  // * AES-GCM tag size:  16
+  static final int MIN_RS = 18;
   static final int MAX_CIPHERTEXT_SIZE = 4096;
 
   static final String HMAC_SHA256 = "HMACSHA256";

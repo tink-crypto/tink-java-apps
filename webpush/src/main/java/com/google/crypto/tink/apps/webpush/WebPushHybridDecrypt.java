@@ -111,7 +111,10 @@ public final class WebPushHybridDecrypt implements HybridDecrypt {
     }
     this.authSecret = builder.authSecret;
 
-    if (builder.recordSize < WebPushConstants.CIPHERTEXT_OVERHEAD
+    // Nothing prevent a max bound for rs. But we know that push messages
+    // are at most MAX_CIPHERTEXT_SIZE (0x1000), and it is usually set to
+    // this value for convenience.
+    if (builder.recordSize < WebPushConstants.MIN_RS
         || builder.recordSize > WebPushConstants.MAX_CIPHERTEXT_SIZE) {
       throw new IllegalArgumentException(
           String.format(
@@ -229,7 +232,7 @@ public final class WebPushHybridDecrypt implements HybridDecrypt {
 
     int recordSize = record.getInt();
     if (recordSize != this.recordSize
-        || recordSize < ciphertext.length
+        || recordSize < (ciphertext.length - WebPushConstants.CONTENT_CODING_HEADER_SIZE)
         || recordSize > WebPushConstants.MAX_CIPHERTEXT_SIZE) {
       throw new GeneralSecurityException("invalid record size: " + recordSize);
     }
