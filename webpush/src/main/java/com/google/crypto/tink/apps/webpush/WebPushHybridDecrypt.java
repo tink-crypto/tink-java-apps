@@ -231,9 +231,10 @@ public final class WebPushHybridDecrypt implements HybridDecrypt {
     record.get(salt);
 
     int recordSize = record.getInt();
-    if (recordSize != this.recordSize
-        || recordSize < (ciphertext.length - WebPushConstants.CONTENT_CODING_HEADER_SIZE)
-        || recordSize > WebPushConstants.MAX_CIPHERTEXT_SIZE) {
+    // Fail if the recordSize is too low for the ciphertext,
+    // or higher than the recordSize we defined
+    if (recordSize > this.recordSize
+        || recordSize < (ciphertext.length - WebPushConstants.CONTENT_CODING_HEADER_SIZE)) {
       throw new GeneralSecurityException("invalid record size: " + recordSize);
     }
 
