@@ -14,6 +14,17 @@
 # limitations under the License.
 ################################################################################
 
+# Builds and releases tink-java-apps on Maven.
+#
+# The behavior of this script can be modified using the following optional env
+# variables:
+#
+# - CONTAINER_IMAGE (unset by default): By default when run locally this script
+#   executes tests directly on the host. The CONTAINER_IMAGE variable can be set
+#   to execute tests in a custom container image for local testing. E.g.:
+#
+#   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-gcloud:latest" \
+#     sh ./kokoro/gcp_ubuntu/release/run_tests.sh
 set -euo pipefail
 
 # Fail if RELEASE_VERSION is not set.
@@ -27,6 +38,19 @@ if [[ -n "${KOKORO_ARTIFACTS_DIR:-}" ]]; then
   IS_KOKORO="true"
 fi
 readonly IS_KOKORO
+
+if [[ "${IS_KOKORO}" == "true" ]]; then
+  readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
+  cd "${TINK_BASE_DIR}/tink_java_apps"
+  source "./kokoro/testutils/java_test_container_images.sh"
+  CONTAINER_IMAGE="${TINK_JAVA_GCLOUD_IMAGE}"
+  RUN_COMMAND_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
+fi
+readonly CONTAINER_IMAGE
+
+if [[ -n "${CONTAINER_IMAGE:-}" ]]; then
+  RUN_COMMAND_ARGS+=( -c "${CONTAINER_IMAGE}" )
+fi
 
 # WARNING: Setting this environment varialble to "true" will cause this script
 # to actually perform a release.
@@ -68,14 +92,17 @@ if [[ "${IS_KOKORO}" == "true" ]]; then
     "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase")"
 fi
 
-./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
+./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
   -n paymentmethodtoken/maven release apps-paymentmethodtoken \
   maven/tink-java-apps-paymentmethodtoken.pom.xml "${RELEASE_VERSION}"
 
-./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
+./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
   -n rewardedads/maven release apps-rewardedads \
   maven/tink-java-apps-rewardedads.pom.xml "${RELEASE_VERSION}"
 
-./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
+./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
   -n webpush/maven release apps-webpush \
   maven/tink-java-apps-webpush.pom.xml "${RELEASE_VERSION}"
