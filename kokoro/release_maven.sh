@@ -24,6 +24,7 @@
 #   to execute tests in a custom container image for local testing. E.g.:
 #
 #   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-gcloud:latest" \
+#     RELEASE_VERSION=HEAD \
 #     sh ./kokoro/gcp_ubuntu/release/run_tests.sh
 set -euo pipefail
 
@@ -39,13 +40,16 @@ if [[ -n "${KOKORO_ARTIFACTS_DIR:-}" ]]; then
 fi
 readonly IS_KOKORO
 
+GITUB_PROTOCOL_AND_AUTH="ssh://git"
 if [[ "${IS_KOKORO}" == "true" ]]; then
   readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
   cd "${TINK_BASE_DIR}/tink_java_apps"
+  GITUB_PROTOCOL_AND_AUTH="https://ise-crypto:${GITHUB_ACCESS_TOKEN}"
   source "./kokoro/testutils/java_test_container_images.sh"
   CONTAINER_IMAGE="${TINK_JAVA_GCLOUD_IMAGE}"
   RUN_COMMAND_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
 fi
+readonly GITUB_PROTOCOL_AND_AUTH
 readonly CONTAINER_IMAGE
 
 if [[ -n "${CONTAINER_IMAGE:-}" ]]; then
@@ -60,17 +64,6 @@ if [[ ! "${DO_MAKE_RELEASE}" =~ ^(false|true)$ ]]; then
   echo "DO_MAKE_RELEASE must be either \"true\" or \"false\"" >&2
   exit 1
 fi
-
-GITUB_PROTOCOL_AND_AUTH="ssh://git"
-if [[ "${IS_KOKORO}" == "true" ]] ; then
-  TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
-  cd "${TINK_BASE_DIR}/tink_java_apps"
-  GITUB_PROTOCOL_AND_AUTH="https://ise-crypto:${GITHUB_ACCESS_TOKEN}"
-fi
-readonly GITUB_PROTOCOL_AND_AUTH
-
-: "${TINK_BASE_DIR:=$(cd .. && pwd)}"
-readonly TINK_BASE_DIR
 
 readonly TINK_JAVA_APPS_GITHUB_URL="github.com/tink-crypto/tink-java-apps"
 readonly GITHUB_URL="${GITUB_PROTOCOL_AND_AUTH}@${TINK_JAVA_APPS_GITHUB_URL}"
