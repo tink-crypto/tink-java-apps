@@ -85,6 +85,9 @@ if [[ "${IS_KOKORO}" == "true" ]]; then
     "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase")"
 fi
 
+# Ensure that secrets are not inadvertently logged.
+set +x
+
 ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
   ./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
   -n paymentmethodtoken/maven release apps-paymentmethodtoken \
