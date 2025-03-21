@@ -74,6 +74,9 @@ if [[ "${DO_MAKE_RELEASE}" == "false" ]]; then
 fi
 readonly MAVEN_DEPLOY_LIBRARY_OPTIONS
 
+# Ensure that secrets are not inadvertently logged.
+set +x
+
 if [[ "${IS_KOKORO}" == "true" ]]; then
   # Import the PGP signing key and make the passphrase available as an env
   # variable.
@@ -84,9 +87,6 @@ if [[ "${IS_KOKORO}" == "true" ]]; then
   export TINK_DEV_MAVEN_PGP_PASSPHRASE="$(cat \
     "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase")"
 fi
-
-# Ensure that secrets are not inadvertently logged.
-set +x
 
 ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
   ./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
