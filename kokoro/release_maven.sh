@@ -84,8 +84,6 @@ if [[ "${IS_KOKORO}" == "true" ]]; then
     --passphrase-file \
     "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase" \
     --batch "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_secret_key"
-  export TINK_DEV_MAVEN_PGP_PASSPHRASE="$(cat \
-    "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase")"
 fi
 
 ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
