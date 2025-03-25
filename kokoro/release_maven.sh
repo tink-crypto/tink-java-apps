@@ -14,18 +14,6 @@
 # limitations under the License.
 ################################################################################
 
-# Builds and releases tink-java-apps on Maven.
-#
-# The behavior of this script can be modified using the following optional env
-# variables:
-#
-# - CONTAINER_IMAGE (unset by default): By default when run locally this script
-#   executes tests directly on the host. The CONTAINER_IMAGE variable can be set
-#   to execute tests in a custom container image for local testing. E.g.:
-#
-#   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-gcloud:latest" \
-#     RELEASE_VERSION=HEAD \
-#     sh ./kokoro/gcp_ubuntu/release/run_tests.sh
 set -euo pipefail
 
 # Fail if RELEASE_VERSION is not set.
@@ -34,27 +22,12 @@ if [[ -z "${RELEASE_VERSION:-}" ]]; then
   exit 1
 fi
 
+readonly TINK_JAVA_APPS_GITHUB_URL="github.com/tink-crypto/tink-java-apps"
 IS_KOKORO="false"
 if [[ -n "${KOKORO_ARTIFACTS_DIR:-}" ]]; then
   IS_KOKORO="true"
 fi
 readonly IS_KOKORO
-
-GITUB_PROTOCOL_AND_AUTH="ssh://git"
-if [[ "${IS_KOKORO}" == "true" ]]; then
-  readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
-  cd "${TINK_BASE_DIR}/tink_java_apps"
-  GITUB_PROTOCOL_AND_AUTH="https://ise-crypto:${GITHUB_ACCESS_TOKEN}"
-  source "./kokoro/testutils/java_test_container_images.sh"
-  CONTAINER_IMAGE="${TINK_JAVA_GCLOUD_IMAGE}"
-  RUN_COMMAND_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
-fi
-readonly GITUB_PROTOCOL_AND_AUTH
-readonly CONTAINER_IMAGE
-
-if [[ -n "${CONTAINER_IMAGE:-}" ]]; then
-  RUN_COMMAND_ARGS+=( -c "${CONTAINER_IMAGE}" )
-fi
 
 # WARNING: Setting this environment varialble to "true" will cause this script
 # to actually perform a release.
@@ -65,35 +38,58 @@ if [[ ! "${DO_MAKE_RELEASE}" =~ ^(false|true)$ ]]; then
   exit 1
 fi
 
-readonly TINK_JAVA_APPS_GITHUB_URL="github.com/tink-crypto/tink-java-apps"
-readonly GITHUB_URL="${GITUB_PROTOCOL_AND_AUTH}@${TINK_JAVA_APPS_GITHUB_URL}"
+#######################################
+# Create a Maven release on Sonatype.
+#
+# Globals:
+#   GITHUB_ACCESS_TOKEN (optional from Kokoro)
+#   IS_KOKORO
+#   RELEASE_VERSION
+#   TINK_JAVA_APPS_GITHUB_URL
+#
+#######################################
+create_maven_release() {
+  local gitub_protocol_and_auth="ssh://git"
+  if [[ "${IS_KOKORO}" == "true" ]] ; then
+    gitub_protocol_and_auth="https://ise-crypto:${GITHUB_ACCESS_TOKEN}"
+  fi
+  readonly gitub_protocol_and_auth
+  local -r github_url="${gitub_protocol_and_auth}@${TINK_JAVA_APPS_GITHUB_URL}"
 
-MAVEN_DEPLOY_LIBRARY_OPTIONS=( -u "${GITHUB_URL}" )
-if [[ "${DO_MAKE_RELEASE}" == "false" ]]; then
-  MAVEN_DEPLOY_LIBRARY_OPTIONS+=( -d )
-fi
-readonly MAVEN_DEPLOY_LIBRARY_OPTIONS
+  local maven_deploy_library_options=( -u "${github_url}" )
+  if [[ "${DO_MAKE_RELEASE}" == "false" ]]; then
+    maven_deploy_library_options+=( -d )
+  fi
+  readonly maven_deploy_library_options
 
-# Ensure that secrets are not inadvertently logged.
-set +x
+  if [[ "${IS_KOKORO}" == "true" ]]; then
+    # Import the PGP signing key and make the passphrase available as an env
+    # variable.
+    gpg --import --pinentry-mode loopback \
+      --passphrase-file \
+      "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase" \
+      --batch "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_secret_key"
+    export TINK_DEV_MAVEN_PGP_PASSPHRASE="$(cat \
+      "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase")"
+  fi
 
-if [[ "${IS_KOKORO}" == "true" ]]; then
-  # Import the PGP signing key and make the passphrase available as an env
-  # variable.
-  gpg --import --pinentry-mode loopback \
-    --passphrase-file \
-    "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase" \
-    --batch "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_secret_key"
-fi
+  ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
+    -n paymentmethodtoken/maven release apps-paymentmethodtoken \
+    maven/tink-java-apps-paymentmethodtoken.pom.xml "${RELEASE_VERSION}"
+  ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
+    -n rewardedads/maven release apps-rewardedads \
+    maven/tink-java-apps-rewardedads.pom.xml "${RELEASE_VERSION}"
+  ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
+    -n webpush/maven release apps-webpush \
+    maven/tink-java-apps-webpush.pom.xml "${RELEASE_VERSION}"
+}
 
-./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
-  -n paymentmethodtoken/maven release apps-paymentmethodtoken \
-  maven/tink-java-apps-paymentmethodtoken.pom.xml "${RELEASE_VERSION}"
+main() {
+  if [[ "${IS_KOKORO}" == "true" ]] ; then
+    readonly TINK_BASE_DIR="$(echo "${KOKORO_ARTIFACTS_DIR}"/git*)"
+    cd "${TINK_BASE_DIR}/tink_java_apps"
+  fi
+  create_maven_release
+}
 
-./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
-  -n rewardedads/maven release apps-rewardedads \
-  maven/tink-java-apps-rewardedads.pom.xml "${RELEASE_VERSION}"
-
-./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
-  -n webpush/maven release apps-webpush \
-  maven/tink-java-apps-webpush.pom.xml "${RELEASE_VERSION}"
+main "$@"
