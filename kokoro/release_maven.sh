@@ -86,17 +86,14 @@ if [[ "${IS_KOKORO}" == "true" ]]; then
     --batch "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_secret_key"
 fi
 
-./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
-  ./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
+./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
   -n paymentmethodtoken/maven release apps-paymentmethodtoken \
   maven/tink-java-apps-paymentmethodtoken.pom.xml "${RELEASE_VERSION}"
 
-./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
-  ./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
+./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
   -n rewardedads/maven release apps-rewardedads \
   maven/tink-java-apps-rewardedads.pom.xml "${RELEASE_VERSION}"
 
-./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
-  ./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
+./maven/maven_deploy_library.sh "${MAVEN_DEPLOY_LIBRARY_OPTIONS[@]}" \
   -n webpush/maven release apps-webpush \
   maven/tink-java-apps-webpush.pom.xml "${RELEASE_VERSION}"
