@@ -14,6 +14,16 @@
 # limitations under the License.
 ################################################################################
 
+# The behavior of this script can be modified using the following optional env
+# variables:
+#
+# - CONTAINER_IMAGE (unset by default): By default when run locally this script
+#   executes tests directly on the host. The CONTAINER_IMAGE variable can be set
+#   to execute tests in a custom container image for local testing. E.g.:
+#
+#   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-gcloud:latest" \
+#     sh ./kokoro/release_maven.sh
+
 set -euo pipefail
 
 # Fail if RELEASE_VERSION is not set.
@@ -52,9 +62,17 @@ create_maven_release() {
   local gitub_protocol_and_auth="ssh://git"
   if [[ "${IS_KOKORO}" == "true" ]] ; then
     gitub_protocol_and_auth="https://ise-crypto:${GITHUB_ACCESS_TOKEN}"
+    source "./kokoro/testutils/java_test_container_images.sh"
+    CONTAINER_IMAGE="${TINK_JAVA_GCLOUD_IMAGE}"
+    RUN_COMMAND_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
   fi
   readonly gitub_protocol_and_auth
   local -r github_url="${gitub_protocol_and_auth}@${TINK_JAVA_APPS_GITHUB_URL}"
+  readonly CONTAINER_IMAGE
+
+  if [[ -n "${CONTAINER_IMAGE:-}" ]]; then
+    RUN_COMMAND_ARGS+=( -c "${CONTAINER_IMAGE}" )
+  fi
 
   local maven_deploy_library_options=( -u "${github_url}" )
   if [[ "${DO_MAKE_RELEASE}" == "false" ]]; then
@@ -69,19 +87,31 @@ create_maven_release() {
       --passphrase-file \
       "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase" \
       --batch "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_secret_key"
-    export TINK_DEV_MAVEN_PGP_PASSPHRASE="$(cat \
-      "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase")"
   fi
 
-  ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
-    -n paymentmethodtoken/maven release apps-paymentmethodtoken \
-    maven/tink-java-apps-paymentmethodtoken.pom.xml "${RELEASE_VERSION}"
-  ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
-    -n rewardedads/maven release apps-rewardedads \
-    maven/tink-java-apps-rewardedads.pom.xml "${RELEASE_VERSION}"
-  ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
-    -n webpush/maven release apps-webpush \
-    maven/tink-java-apps-webpush.pom.xml "${RELEASE_VERSION}"
+  # Share the required env variables with the container to allow publishing the
+  # snapshot on Sonatype.
+  cat <<EOF > env_variables.txt
+SONATYPE_USERNAME
+SONATYPE_PASSWORD
+TINK_DEV_MAVEN_PGP_PASSPHRASE
+EOF
+  RUN_COMMAND_ARGS+=( -e env_variables.txt )
+
+  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+    ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
+      -n paymentmethodtoken/maven release apps-paymentmethodtoken \
+      maven/tink-java-apps-paymentmethodtoken.pom.xml "${RELEASE_VERSION}"
+
+  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+    ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
+      -n rewardedads/maven release apps-rewardedads \
+      maven/tink-java-apps-rewardedads.pom.xml "${RELEASE_VERSION}"
+
+  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+    ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
+      -n webpush/maven release apps-webpush \
+      maven/tink-java-apps-webpush.pom.xml "${RELEASE_VERSION}"
 }
 
 main() {
