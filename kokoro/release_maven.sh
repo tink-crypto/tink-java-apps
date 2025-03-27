@@ -80,7 +80,7 @@ create_maven_release() {
   fi
   readonly maven_deploy_library_options
 
-  if [[ "${IS_KOKORO}" == "true" ]]; then
+  if [[ "${IS_KOKORO}" == "true" && "${DO_MAKE_RELEASE}" == "true" ]]; then
     # Import the PGP signing key and make the passphrase available as an env
     # variable.
     gpg --import --pinentry-mode loopback \
