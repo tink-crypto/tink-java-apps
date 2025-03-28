@@ -21,7 +21,7 @@
 #   executes tests directly on the host. The CONTAINER_IMAGE variable can be set
 #   to execute tests in a custom container image for local testing. E.g.:
 #
-#   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-gcloud:latest" \
+#   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-base:latest" \
 #     sh ./kokoro/release_maven.sh
 
 set -euo pipefail
@@ -63,7 +63,7 @@ create_maven_release() {
   if [[ "${IS_KOKORO}" == "true" ]] ; then
     gitub_protocol_and_auth="https://ise-crypto:${GITHUB_ACCESS_TOKEN}"
     source "./kokoro/testutils/java_test_container_images.sh"
-    CONTAINER_IMAGE="${TINK_JAVA_GCLOUD_IMAGE}"
+    CONTAINER_IMAGE="${TINK_JAVA_BASE_IMAGE}"
     RUN_COMMAND_ARGS+=( -k "${TINK_GCR_SERVICE_KEY}" )
   fi
   readonly gitub_protocol_and_auth
