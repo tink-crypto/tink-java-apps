@@ -80,14 +80,24 @@ create_maven_release() {
   fi
   readonly maven_deploy_library_options
 
+  local install_mvn_certificate_cmd=""
+
   if [[ "${IS_KOKORO}" == "true" && "${DO_MAKE_RELEASE}" == "true" ]]; then
-    # Import the PGP signing key and make the passphrase available as an env
-    # variable.
-    gpg --import --pinentry-mode loopback \
-      --passphrase-file \
-      "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase" \
-      --batch "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_secret_key"
+    # Copy PGP key and passphrase files where the container can access them.
+    cp "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_secret_key" \
+      tink_dev_maven_pgp_secret_key
+    cp "${KOKORO_KEYSTORE_DIR}/70968_tink_dev_maven_pgp_passphrase" \
+      tink_dev_maven_pgp_passphrase
+    cat <<EOF > install_maven_key.sh
+gpg --import --pinentry-mode loopback --passphrase-file \
+  ./tink_dev_maven_pgp_passphrase --batch ./tink_dev_maven_pgp_secret_key
+EOF
+     chmod +x install_maven_key.sh
+
+     install_mvn_certificate_cmd="./install_maven_key.sh &&"
   fi
+
+  readonly install_mvn_certificate_cmd
 
   # Share the required env variables with the container to allow publishing the
   # snapshot on Sonatype.
@@ -99,16 +109,19 @@ EOF
   RUN_COMMAND_ARGS+=( -e env_variables.txt )
 
   ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+    "${install_mvn_certificate_cmd}" \
     ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
       -n paymentmethodtoken/maven release apps-paymentmethodtoken \
       maven/tink-java-apps-paymentmethodtoken.pom.xml "${RELEASE_VERSION}"
 
   ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+    "${install_mvn_certificate_cmd}" \
     ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
       -n rewardedads/maven release apps-rewardedads \
       maven/tink-java-apps-rewardedads.pom.xml "${RELEASE_VERSION}"
 
   ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+    "${install_mvn_certificate_cmd}" \
     ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
       -n webpush/maven release apps-webpush \
       maven/tink-java-apps-webpush.pom.xml "${RELEASE_VERSION}"
