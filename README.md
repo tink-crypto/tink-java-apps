@@ -24,7 +24,7 @@ This repository contains extensions and applications of the
 *   `apps-webpush`: An implementation of
     [RFC 8291 - Message Encryption for Web Push](https://www.rfc-editor.org/rfc/rfc8291)
 
-The latest version of these applications is 1.12.1.
+The latest version of these applications is 1.12.2.
 
 The official Tink documentation is available at
 https://developers.google.com/tink.
@@ -37,12 +37,12 @@ You can add this library as a Maven dependency:
 <dependency>
   <groupId>com.google.crypto.tink</groupId>
   <artifactId>apps-paymentmethodtoken</artifactId>
-  <version>1.12.1</version>
+  <version>1.12.2</version>
 </dependency>
 ```
 
 The Javadoc for the latest release can be found
-[here](https://tink-crypto.github.io/tink-java-apps/javadoc/apps-paymentmethodtoken/1.12.1/).
+[here](https://tink-crypto.github.io/tink-java-apps/javadoc/apps-paymentmethodtoken/1.12.2/).
 
 ### apps-rewardedads
 
@@ -52,12 +52,12 @@ You can add this library as a Maven dependency:
 <dependency>
   <groupId>com.google.crypto.tink</groupId>
   <artifactId>apps-rewardedads</artifactId>
-  <version>1.12.1</version>
+  <version>1.12.2</version>
 </dependency>
 ```
 
 The Javadoc for the latest release can be found
-[here](https://tink-crypto.github.io/tink-java-apps/javadoc/apps-rewardedads/1.12.1/).
+[here](https://tink-crypto.github.io/tink-java-apps/javadoc/apps-rewardedads/1.12.2/).
 
 ### apps-webpush
 
@@ -67,12 +67,12 @@ You can add this library as a Maven dependency:
 <dependency>
   <groupId>com.google.crypto.tink</groupId>
   <artifactId>apps-webpush</artifactId>
-  <version>1.12.1</version>
+  <version>1.12.2</version>
 </dependency>
 ```
 
 The Javadoc for the latest release can be found
-[here](https://tink-crypto.github.io/tink-java-apps/javadoc/apps-webpush/1.12.1/).
+[here](https://tink-crypto.github.io/tink-java-apps/javadoc/apps-webpush/1.12.2/).
 
 You can encrypt a plaintext as follows:
 

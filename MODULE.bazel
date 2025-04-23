@@ -2,7 +2,7 @@
 
 module(
     name = "tink_java_apps",
-    version = "1.12.1",
+    version = "1.12.2",
 )
 
 bazel_dep(
