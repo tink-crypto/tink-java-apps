@@ -108,19 +108,19 @@ TINK_DEV_MAVEN_PGP_PASSPHRASE
 EOF
   RUN_COMMAND_ARGS+=( -e env_variables.txt )
 
-  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
     "${install_mvn_certificate_cmd}" \
     ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
       -n paymentmethodtoken/maven release apps-paymentmethodtoken \
       maven/tink-java-apps-paymentmethodtoken.pom.xml "${RELEASE_VERSION}"
 
-  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
     "${install_mvn_certificate_cmd}" \
     ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
       -n rewardedads/maven release apps-rewardedads \
       maven/tink-java-apps-rewardedads.pom.xml "${RELEASE_VERSION}"
 
-  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
     "${install_mvn_certificate_cmd}" \
     ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
       -n webpush/maven release apps-webpush \

@@ -65,17 +65,17 @@ SONATYPE_PASSWORD
 EOF
   RUN_COMMAND_ARGS+=( -e env_variables.txt )
 
-  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
     ./maven/maven_deploy_library.sh -u "${GITHUB_URL}" \
       -n paymentmethodtoken/maven snapshot apps-paymentmethodtoken \
       maven/tink-java-apps-paymentmethodtoken.pom.xml HEAD
 
-  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
     ./maven/maven_deploy_library.sh -u "${GITHUB_URL}" \
       -n rewardedads/maven snapshot apps-rewardedads \
       maven/tink-java-apps-rewardedads.pom.xml HEAD
 
-  ./kokoro/testutils/run_command.sh "${RUN_COMMAND_ARGS[@]}" \
+  ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
     ./maven/maven_deploy_library.sh -u "${GITHUB_URL}" \
       -n webpush/maven snapshot apps-webpush \
       maven/tink-java-apps-webpush.pom.xml HEAD
