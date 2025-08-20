@@ -1,0 +1,133 @@
+licenses(["notice"])
+
+java_test(
+    name = "ExampleTest",
+    size = "small",
+    srcs = ["ExampleTest.java"],
+    deps = [
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_constants",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_recipient",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_sender",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:sender_intermediate_cert_factory",
+        "@maven//:com_google_truth_truth",
+        "@maven//:junit_junit",
+    ],
+)
+
+java_test(
+    name = "GooglePaymentsPublicKeyManagerTest",
+    size = "small",
+    srcs = ["GooglePaymentsPublicKeyManagerTest.java"],
+    deps = [
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:google_payments_public_keys_manager",
+        "@maven//:junit_junit",
+    ],
+)
+
+java_test(
+    name = "JwtKeyConverterTest",
+    size = "small",
+    srcs = ["JwtKeyConverterTest.java"],
+    deps = [
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:jwt_key_converter",
+        "@maven//:com_google_crypto_tink_tink",
+        "@maven//:com_google_truth_truth",
+        "@maven//:junit_junit",
+    ],
+)
+
+java_test(
+    name = "KeysDownloaderTest",
+    size = "small",
+    srcs = ["KeysDownloaderTest.java"],
+    deps = [
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:keys_downloader",
+        "@maven//:com_google_errorprone_error_prone_annotations",
+        "@maven//:com_google_http_client_google_http_client",
+        "@maven//:junit_junit",
+    ],
+)
+
+java_test(
+    name = "PaymentMethodJsonEncodingTest",
+    size = "small",
+    srcs = ["PaymentMethodJsonEncodingTest.java"],
+    deps = [
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_hybrid_encrypt",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_sender",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:sender_intermediate_cert_factory",
+        "@maven//:junit_junit",
+    ],
+)
+
+java_test(
+    name = "PaymentMethodTokenHybridDecryptTest",
+    size = "small",
+    srcs = ["PaymentMethodTokenHybridDecryptTest.java"],
+    deps = [
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_constants",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_hybrid_decrypt",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_hybrid_encrypt",
+        "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_crypto_tink_tink",
+        "@maven//:junit_junit",
+    ],
+)
+
+java_test(
+    name = "PaymentMethodTokenHybridEncryptTest",
+    size = "small",
+    srcs = ["PaymentMethodTokenHybridEncryptTest.java"],
+    deps = [
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_constants",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_hybrid_decrypt",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_hybrid_encrypt",
+        "@maven//:com_google_crypto_tink_tink",
+        "@maven//:junit_junit",
+    ],
+)
+
+java_test(
+    name = "PaymentMethodTokenRecipientTest",
+    size = "small",
+    srcs = ["PaymentMethodTokenRecipientTest.java"],
+    deps = [
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:google_payments_public_keys_manager",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_constants",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_recipient",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_recipient_kem",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_sender",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_util",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:sender_intermediate_cert_factory",
+        "@maven//:com_google_code_gson_gson",
+        "@maven//:com_google_crypto_tink_tink",
+        "@maven//:com_google_http_client_google_http_client",
+        "@maven//:junit_junit",
+    ],
+)
+
+java_test(
+    name = "PaymentMethodTokenSenderTest",
+    size = "small",
+    srcs = ["PaymentMethodTokenSenderTest.java"],
+    deps = [
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_constants",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_recipient",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_sender",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:sender_intermediate_cert_factory",
+        "@maven//:com_google_crypto_tink_tink",
+        "@maven//:junit_junit",
+    ],
+)
+
+java_test(
+    name = "SenderIntermediateCertFactoryTest",
+    size = "small",
+    srcs = ["SenderIntermediateCertFactoryTest.java"],
+    deps = [
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:payment_method_token_constants",
+        "//paymentmethodtoken/src/main/java/com/google/crypto/tink/apps/paymentmethodtoken:sender_intermediate_cert_factory",
+        "@maven//:com_google_code_gson_gson",
+        "@maven//:junit_junit",
+    ],
+)
