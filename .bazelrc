@@ -1,6 +1,6 @@
 build --cxxopt='-std=c++14' --host_cxxopt='-std=c++14'
-build --java_language_version=8
-build --java_runtime_version=local_jdk
+build --java_language_version=11
+build --java_runtime_version=remotejdk_11
 
 # Silence all C/C++ warnings in external code.
 #

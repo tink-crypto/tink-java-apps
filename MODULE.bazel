@@ -9,32 +9,17 @@ bazel_dep(
     name = "platforms",
     version = "0.0.10",
 )
-
 bazel_dep(
     name = "bazel_skylib",
     version = "1.7.1",
 )
-
 bazel_dep(
     name = "rules_java",
     version = "7.6.5",
 )
-
 bazel_dep(
     name = "rules_jvm_external",
-    version = "6.1",
-)
-
-# Overriding to a commit that doesn't check for Java version. This is to avoid version parsing [1]
-# which may fail [2]. Note that since [1] rules_jvm_external requires Java 11.
-#
-# [1] https://github.com/bazelbuild/rules_jvm_external/commit/4f56f7cec2fa3a47e34d48b8f6293785cfad7e3a
-# [2] https://github.com/bazelbuild/rules_jvm_external/issues/1115
-# Commit from Apr 29, 2024.
-git_override(
-    module_name = "rules_jvm_external",
-    commit = "4f56f7cec2fa3a47e34d48b8f6293785cfad7e3a",
-    remote = "https://github.com/bazelbuild/rules_jvm_external",
+    version = "6.3",
 )
 
 # This is needed to overwrite rules_jvm_external's toolchain to allow running with `root` as user.
@@ -42,7 +27,6 @@ bazel_dep(
     name = "rules_python",
     version = "0.33.2",
 )
-
 bazel_dep(
     name = "rules_android",
     version = "0.2.0",
@@ -65,7 +49,6 @@ register_toolchains(
 )
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
-
 python.toolchain(
     configure_coverage_tool = True,
     ignore_root_user_error = True,
@@ -75,7 +58,6 @@ python.toolchain(
 )
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
-
 maven.install(
     artifacts = [
         "androidx.annotation:annotation:1.8.2",
@@ -91,5 +73,4 @@ maven.install(
         "https://repo1.maven.org/maven2",
     ],
 )
-
 use_repo(maven, "maven")
