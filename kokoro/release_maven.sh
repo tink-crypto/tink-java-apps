@@ -75,9 +75,6 @@ create_maven_release() {
   fi
 
   local maven_deploy_library_options=( -u "${github_url}" )
-  if [[ "${DO_MAKE_RELEASE}" == "false" ]]; then
-    maven_deploy_library_options+=( -d )
-  fi
   readonly maven_deploy_library_options
 
   local install_mvn_certificate_cmd=""
