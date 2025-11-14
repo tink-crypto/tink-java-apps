@@ -56,6 +56,7 @@ fi
 #   IS_KOKORO
 #   RELEASE_VERSION
 #   TINK_JAVA_APPS_GITHUB_URL
+#   DO_MAKE_RELEASE
 #
 #######################################
 create_maven_release() {
@@ -69,6 +70,12 @@ create_maven_release() {
   readonly gitub_protocol_and_auth
   local -r github_url="${gitub_protocol_and_auth}@${TINK_JAVA_APPS_GITHUB_URL}"
   readonly CONTAINER_IMAGE
+
+  local mvn_action="install"
+  if [[ "${DO_MAKE_RELEASE}" == "true" ]] ; then
+    mvn_action="release"
+  fi
+  readonly mvn_action
 
   if [[ -n "${CONTAINER_IMAGE:-}" ]]; then
     RUN_COMMAND_ARGS+=( -c "${CONTAINER_IMAGE}" )
@@ -108,19 +115,19 @@ EOF
   ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
     "${install_mvn_certificate_cmd}" \
     ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
-      -n paymentmethodtoken/maven release apps-paymentmethodtoken \
+      -n paymentmethodtoken/maven "${mvn_action}" apps-paymentmethodtoken \
       maven/tink-java-apps-paymentmethodtoken.pom.xml "${RELEASE_VERSION}"
 
   ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
     "${install_mvn_certificate_cmd}" \
     ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
-      -n rewardedads/maven release apps-rewardedads \
+      -n rewardedads/maven "${mvn_action}" apps-rewardedads \
       maven/tink-java-apps-rewardedads.pom.xml "${RELEASE_VERSION}"
 
   ./kokoro/testutils/docker_execute.sh "${RUN_COMMAND_ARGS[@]}" \
     "${install_mvn_certificate_cmd}" \
     ./maven/maven_deploy_library.sh "${maven_deploy_library_options[@]}" \
-      -n webpush/maven release apps-webpush \
+      -n webpush/maven "${mvn_action}" apps-webpush \
       maven/tink-java-apps-webpush.pom.xml "${RELEASE_VERSION}"
 }
 
