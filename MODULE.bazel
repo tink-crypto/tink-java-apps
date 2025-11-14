@@ -2,46 +2,15 @@
 
 module(
     name = "tink_java_apps",
-    version = "1.12.2",
+    version = "1.13.0",
 )
 
-bazel_dep(
-    name = "platforms",
-    version = "0.0.10",
-)
-bazel_dep(
-    name = "bazel_skylib",
-    version = "1.7.1",
-)
-bazel_dep(
-    name = "rules_java",
-    version = "7.6.5",
-)
-bazel_dep(
-    name = "rules_jvm_external",
-    version = "6.3",
-)
-
-# This is needed to overwrite rules_jvm_external's toolchain to allow running with `root` as user.
-bazel_dep(
-    name = "rules_python",
-    version = "0.33.2",
-)
-bazel_dep(
-    name = "rules_android",
-    version = "0.2.0",
-)
-
-# Overriding as per
-# https://github.com/bazelbuild/rules_android/blob/eb728f67cae8392360338d07d59835db76bee2c2/README.md.
-# Commit from May 22, 2024.
-RULES_ANDROID_COMMIT = "b2e8bf74e84b1bb20102e44d34620d4ad9ff3dd8"
-
-git_override(
-    module_name = "rules_android",
-    commit = RULES_ANDROID_COMMIT,
-    remote = "https://github.com/bazelbuild/rules_android",
-)
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "bazel_skylib", version = "1.8.1")
+bazel_dep(name = "rules_java", version = "8.16.1")
+bazel_dep(name = "rules_jvm_external", version = "6.7")
+bazel_dep(name = "rules_android", version = "0.6.6")
+bazel_dep(name = "rules_python", version = "1.6.3")
 
 register_toolchains(
     "@rules_android//toolchains/android:android_default_toolchain",
