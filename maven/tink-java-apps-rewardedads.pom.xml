@@ -81,13 +81,19 @@
 
   <properties>
     <java.version>11</java.version>
-    <error_prone_annotations.version>2.22.0</error_prone_annotations.version>
+    <jsr305.version>3.0.2</jsr305.version>
+    <error_prone_annotations.version>2.41.0</error_prone_annotations.version>
     <google-http-client.version>2.0.0</google-http-client.version>
     <gson.version>2.13.2</gson.version>
     <tink.version>1.19.0</tink.version>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>${jsr305.version}</version>
+    </dependency>
     <dependency>
       <groupId>com.google.errorprone</groupId>
       <artifactId>error_prone_annotations</artifactId>

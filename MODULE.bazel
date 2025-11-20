@@ -31,8 +31,9 @@ maven.install(
     artifacts = [
         "androidx.annotation:annotation:1.8.2",
         "com.google.code.findbugs:jsr305:3.0.2",
+        "com.google.code.gson:gson:2.13.2",
         "com.google.crypto.tink:tink:1.19.0",
-        "com.google.errorprone:error_prone_annotations:2.23.0",
+        "com.google.errorprone:error_prone_annotations:2.41.0",
         "com.google.http-client:google-http-client:2.0.0",
         "org.ow2.asm:asm-commons:9.7",
         "org.pantsbuild:jarjar:1.7.2",
