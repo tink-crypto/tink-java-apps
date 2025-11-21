@@ -1,4 +1,5 @@
-load("//tools:gen_maven_jar_rules.bzl", "gen_maven_jar_rules")
+load("//:version.bzl", "TINK_APPS_VERSION_LABEL")
+load("//tools:gen_maven_jar_rules.bzl", "gen_maven_jar_rules", "maven_bundle")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,4 +17,30 @@ gen_maven_jar_rules(
         "//webpush/src/main/java/com/google/crypto/tink/apps/webpush:web_push_hybrid_encrypt",
         "//webpush/src/main/java/com/google/crypto/tink/apps/webpush:web_push_util",
     ],
+)
+
+# Note: before building this target you need to add files with the key and pin.
+# See the documentation of maven_bundle for how to create these.
+maven_bundle(
+    name = "webpush-snapshot-bundle",
+    gpg_pin_file = "//:gpg_test_pin.txt",
+    gpg_secret_key_file = "//:gpg_test_key.asc",
+    lib_name = "webpush",
+    lib_version = "HEAD-SNAPSHOT",
+    maven_jar_rules_target = ":maven",
+    pom_template = "//maven:tink-java-apps-webpush.pom.xml",
+    tags = ["manual"],
+)
+
+# Note: before building this target you need to add files with the key and pin.
+# See the documentation of maven_bundle for how to create these.
+maven_bundle(
+    name = "webpush-release-bundle",
+    gpg_pin_file = "//:gpg_pin.txt",
+    gpg_secret_key_file = "//:gpg_key.asc",
+    lib_name = "webpush",
+    lib_version = TINK_APPS_VERSION_LABEL,
+    maven_jar_rules_target = ":maven",
+    pom_template = "//maven:tink-java-apps-webpush.pom.xml",
+    tags = ["manual"],
 )

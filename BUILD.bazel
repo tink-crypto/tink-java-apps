@@ -1,3 +1,17 @@
 package(default_visibility = ["//:__subpackages__"])
 
 licenses(["notice"])
+
+exports_files(
+    glob(
+        [
+            # These files are populated by test scripts.
+            "gpg_test_pin.txt",
+            "gpg_test_key.asc",
+            # These files are populated by release scripts.
+            "gpg_pin.txt",
+            "gpg_key.asc",
+        ],
+        allow_empty = True,
+    ),
+)
