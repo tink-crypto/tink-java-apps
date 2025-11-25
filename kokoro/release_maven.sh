@@ -112,7 +112,7 @@ readonly BASE64TOKEN="$(cat ${BASE64TOKENFILE})"
 
 declare -ar APPS=(paymentmethodtoken rewardedads webpush)
 
-for app in APPS ; do
+for app in "${APPS[@]}" ; do
   curl --request POST \
     --header "Authorization: Bearer ${BASE64TOKEN}" \
     --form bundle=@kokoro_upload_dir/release/"${app}"-release-bundle.zip \
