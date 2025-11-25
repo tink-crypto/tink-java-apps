@@ -115,6 +115,6 @@ declare -ar APPS=(paymentmethodtoken rewardedads webpush)
 for app in APPS ; do
   curl --request POST \
     --header "Authorization: Bearer ${BASE64TOKEN}" \
-    --form bundle=@kokoro_upload_dir/release/tink-java-apps/"${app}"-release-bundle.zip \
+    --form bundle=@kokoro_upload_dir/release/"${app}"-release-bundle.zip \
     https://central.sonatype.com/api/v1/publisher/upload
 done
