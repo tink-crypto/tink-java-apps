@@ -102,7 +102,7 @@ fi
 CREDENTIAL_WRAPPING_KEY="${KOKORO_KEYSTORE_DIR}/70968_tink_tinkey_release_wrapping_key.pb"
 
 readonly BASE64TOKENFILE="$(mktemp)"
-"${KOKORO_BLAZE_DIR}/GoTools/blaze-bin/third_party/tink/integration/go/kokorotools/hybridencryption" \
+"${KOKORO_BLAZE_DIR}/GoTools/blaze-bin/third_party/tink/integration/go/kokorotools/hybrid_encryption" \
   --tink_key_file="${CREDENTIAL_WRAPPING_KEY}" \
   --source_file="${TINK_BASE_DIR}/tink_java_apps/tools/maven_central_tokens/encrypted_password" \
   --dest_file="${BASE64TOKENFILE}" \
