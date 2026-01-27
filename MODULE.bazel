@@ -29,7 +29,6 @@ python.toolchain(
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     artifacts = [
-        "androidx.annotation:annotation:1.8.2",
         "com.google.code.findbugs:jsr305:3.0.2",
         "com.google.code.gson:gson:2.13.2",
         "com.google.crypto.tink:tink:1.19.0",
@@ -39,7 +38,6 @@ maven.install(
         "org.pantsbuild:jarjar:1.7.2",
     ],
     repositories = [
-        "https://maven.google.com",  # For androidx.annotation:annotation:1.5.0.
         "https://repo1.maven.org/maven2",
     ],
 )

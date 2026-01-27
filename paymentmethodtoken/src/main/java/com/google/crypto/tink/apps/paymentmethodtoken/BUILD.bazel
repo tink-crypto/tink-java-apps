@@ -118,7 +118,6 @@ java_library(
     name = "keys_downloader",
     srcs = ["KeysDownloader.java"],
     deps = [
-        "@maven//:androidx_annotation_annotation_jvm",
         "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:com_google_crypto_tink_tink",
         "@maven//:com_google_errorprone_error_prone_annotations",
