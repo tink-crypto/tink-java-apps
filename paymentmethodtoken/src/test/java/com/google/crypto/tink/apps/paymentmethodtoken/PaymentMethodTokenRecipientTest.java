@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc.
+// Copyright 2017 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -225,7 +225,7 @@ public class PaymentMethodTokenRecipientTest {
       implements PaymentMethodTokenRecipientKem {
     private final ECPrivateKey privateKey;
 
-    public MyPaymentMethodTokenRecipientKem(String recipientPrivateKey)
+    MyPaymentMethodTokenRecipientKem(String recipientPrivateKey)
         throws GeneralSecurityException {
       privateKey = PaymentMethodTokenUtil.pkcs8EcPrivateKey(recipientPrivateKey);
     }
