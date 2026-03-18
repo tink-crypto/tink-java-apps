@@ -81,14 +81,13 @@ public class RewardedAdsVerifierTest {
   }
 
   private static String buildUrl(String rewardUrl, byte[] sig, long keyId) {
-    return new StringBuilder(rewardUrl)
-        .append("&")
-        .append(RewardedAdsVerifier.SIGNATURE_PARAM_NAME)
-        .append(Base64.urlSafeEncode(sig))
-        .append("&")
-        .append(RewardedAdsVerifier.KEY_ID_PARAM_NAME)
-        .append(keyId)
-        .toString();
+    return rewardUrl
+        + "&"
+        + RewardedAdsVerifier.SIGNATURE_PARAM_NAME
+        + Base64.urlSafeEncode(sig)
+        + "&"
+        + RewardedAdsVerifier.KEY_ID_PARAM_NAME
+        + keyId;
   }
 
   @Test
@@ -257,12 +256,7 @@ public class RewardedAdsVerifierTest {
             .setVerifyingPublicKeys(GOOGLE_VERIFYING_PUBLIC_KEYS_JSON)
             .build();
     try {
-      verifier.verify(
-          new StringBuilder(REWARD_URL)
-              .append("&")
-              .append(RewardedAdsVerifier.SIGNATURE_PARAM_NAME)
-              .append("foo")
-              .toString());
+      verifier.verify(REWARD_URL + "&" + RewardedAdsVerifier.SIGNATURE_PARAM_NAME + "foo");
     } catch (GeneralSecurityException e) {
       assertEquals("signature and key id must be the last two query parameters", e.getMessage());
     }
@@ -275,10 +269,7 @@ public class RewardedAdsVerifierTest {
             .setVerifyingPublicKeys(GOOGLE_VERIFYING_PUBLIC_KEYS_JSON)
             .build();
     try {
-      verifier.verify(
-          new StringBuilder(REWARD_HOST_AND_PATH)
-              .append(RewardedAdsVerifier.SIGNATURE_PARAM_NAME)
-              .toString());
+      verifier.verify(REWARD_HOST_AND_PATH + RewardedAdsVerifier.SIGNATURE_PARAM_NAME);
     } catch (GeneralSecurityException e) {
       assertEquals("signature and key id must be the last two query parameters", e.getMessage());
     }
@@ -292,14 +283,13 @@ public class RewardedAdsVerifierTest {
             .build();
     try {
       verifier.verify(
-          new StringBuilder(REWARD_HOST_AND_PATH)
-              .append(RewardedAdsVerifier.SIGNATURE_PARAM_NAME)
-              .append("foo")
-              .append("&")
-              .append(RewardedAdsVerifier.KEY_ID_PARAM_NAME)
-              .append("123")
-              .append("bar=baz")
-              .toString());
+          REWARD_HOST_AND_PATH
+              + RewardedAdsVerifier.SIGNATURE_PARAM_NAME
+              + "foo"
+              + "&"
+              + RewardedAdsVerifier.KEY_ID_PARAM_NAME
+              + "123"
+              + "bar=baz");
     } catch (GeneralSecurityException e) {
       assertEquals("signature and key id must be the last two query parameters", e.getMessage());
     }
@@ -313,15 +303,14 @@ public class RewardedAdsVerifierTest {
             .build();
     try {
       verifier.verify(
-          new StringBuilder(REWARD_URL)
-              .append("&")
-              .append(RewardedAdsVerifier.SIGNATURE_PARAM_NAME)
-              .append("foo")
-              .append("&")
-              .append(RewardedAdsVerifier.KEY_ID_PARAM_NAME)
-              .append("123")
-              .append("&bar=baz") // this would be interpreted as part of the key ID
-              .toString());
+          REWARD_URL
+              + "&"
+              + RewardedAdsVerifier.SIGNATURE_PARAM_NAME
+              + "foo"
+              + "&"
+              + RewardedAdsVerifier.KEY_ID_PARAM_NAME
+              + "123"
+              + "&bar=baz");
     } catch (GeneralSecurityException e) {
       assertEquals("key_id must be a long", e.getMessage());
     }
@@ -335,13 +324,12 @@ public class RewardedAdsVerifierTest {
             .build();
     try {
       verifier.verify(
-          new StringBuilder(REWARD_URL)
-              .append("&")
-              .append(RewardedAdsVerifier.SIGNATURE_PARAM_NAME)
-              .append("foo")
-              .append(RewardedAdsVerifier.KEY_ID_PARAM_NAME)
-              .append("123")
-              .toString());
+          REWARD_URL
+              + "&"
+              + RewardedAdsVerifier.SIGNATURE_PARAM_NAME
+              + "foo"
+              + RewardedAdsVerifier.KEY_ID_PARAM_NAME
+              + "123");
     } catch (GeneralSecurityException e) {
       assertEquals("signature and key id must be the last two query parameters", e.getMessage());
     }
@@ -355,14 +343,13 @@ public class RewardedAdsVerifierTest {
             .build();
     try {
       verifier.verify(
-          new StringBuilder(REWARD_URL)
-              .append("&")
-              .append(RewardedAdsVerifier.SIGNATURE_PARAM_NAME)
-              .append("foo")
-              .append("&")
-              .append(RewardedAdsVerifier.KEY_ID_PARAM_NAME)
-              .append("not_long")
-              .toString());
+          REWARD_URL
+              + "&"
+              + RewardedAdsVerifier.SIGNATURE_PARAM_NAME
+              + "foo"
+              + "&"
+              + RewardedAdsVerifier.KEY_ID_PARAM_NAME
+              + "not_long");
     } catch (GeneralSecurityException e) {
       assertEquals("key_id must be a long", e.getMessage());
     }
