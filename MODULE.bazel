@@ -33,13 +33,13 @@ maven.install(
     artifacts = [
         "com.google.code.findbugs:jsr305:3.0.2",
         "com.google.code.gson:gson:2.13.2",
-        "com.google.crypto.tink:tink:1.19.0",
+        "com.google.crypto.tink:tink:1.23.0",
         "com.google.errorprone:error_prone_annotations:2.41.0",
         "com.google.http-client:google-http-client:2.0.0",
         "org.ow2.asm:asm-commons:9.7",
         "org.pantsbuild:jarjar:1.7.2",
         "junit:junit:4.13.2",
-        "com.google.truth:truth:1.4.2",
+        "com.google.truth:truth:1.4.5",
     ],
     repositories = [
         "https://repo1.maven.org/maven2",
