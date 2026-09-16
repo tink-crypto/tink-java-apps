@@ -18,13 +18,14 @@ package com.google.crypto.tink.apps.webpush;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 import com.google.crypto.tink.HybridDecrypt;
 import com.google.crypto.tink.HybridEncrypt;
 import com.google.crypto.tink.subtle.Base64;
 import com.google.crypto.tink.subtle.EllipticCurves;
 import com.google.crypto.tink.subtle.Random;
+import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.interfaces.ECPrivateKey;
@@ -64,7 +65,7 @@ public class WebPushHybridDecryptTest {
             .withRecipientPublicKey(recipientPublicKey)
             .withRecipientPrivateKey(recipientPrivateKey)
             .build();
-    assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, null /* contextInfo */));
+    assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
   }
 
   @Test
@@ -76,30 +77,21 @@ public class WebPushHybridDecryptTest {
 
     // Test with out of range record sizes.
     {
-      try {
-        new WebPushHybridDecrypt.Builder()
-            .withRecordSize(WebPushConstants.MAX_CIPHERTEXT_SIZE + 1)
-            .withAuthSecret(authSecret)
-            .withRecipientPublicKey(uaPublicKey)
-            .withRecipientPrivateKey(uaPrivateKey)
-            .build();
-        fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException ex) {
-        // expected.
-      }
+      WebPushHybridDecrypt.Builder builder =
+          new WebPushHybridDecrypt.Builder()
+              .withRecordSize(WebPushConstants.MAX_CIPHERTEXT_SIZE + 1)
+              .withAuthSecret(authSecret)
+              .withRecipientPublicKey(uaPublicKey)
+              .withRecipientPrivateKey(uaPrivateKey);
+      assertThrows(IllegalArgumentException.class, () -> builder.build());
 
-      try {
-        Object unused =
-            new WebPushHybridDecrypt.Builder()
-                .withRecordSize(WebPushConstants.CIPHERTEXT_OVERHEAD - 1)
-                .withAuthSecret(authSecret)
-                .withRecipientPublicKey(uaPublicKey)
-                .withRecipientPrivateKey(uaPrivateKey)
-                .build();
-        fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException ex) {
-        // expected.
-      }
+      WebPushHybridDecrypt.Builder builder2 =
+          new WebPushHybridDecrypt.Builder()
+              .withRecordSize(WebPushConstants.CIPHERTEXT_OVERHEAD - 1)
+              .withAuthSecret(authSecret)
+              .withRecipientPublicKey(uaPublicKey)
+              .withRecipientPrivateKey(uaPrivateKey);
+      assertThrows(IllegalArgumentException.class, () -> builder2.build());
     }
 
     // Test with random mismatched record size.
@@ -125,14 +117,11 @@ public class WebPushHybridDecryptTest {
                 .withRecipientPrivateKey(uaPrivateKey)
                 .build();
         byte[] plaintext = Random.randBytes(recordSize - WebPushConstants.CIPHERTEXT_OVERHEAD);
-        byte[] ciphertext = hybridEncrypt.encrypt(plaintext, null /* contextInfo */);
+        byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
 
-        try {
-          hybridDecrypt.decrypt(ciphertext, null /* contextInfo */);
-          fail("Expected GeneralSecurityException");
-        } catch (GeneralSecurityException ex) {
-          // expected.
-        }
+        assertThrows(
+            GeneralSecurityException.class,
+            () -> hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
       }
     }
   }
@@ -156,14 +145,10 @@ public class WebPushHybridDecryptTest {
             .withRecipientPrivateKey(uaPrivateKey)
             .build();
     byte[] plaintext = Random.randBytes(20);
-    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, null /* contextInfo */);
-    try {
-      byte[] contextInfo = new byte[0];
-      hybridDecrypt.decrypt(ciphertext, contextInfo);
-      fail("Expected GeneralSecurityException");
-    } catch (GeneralSecurityException ex) {
-      // expected;
-    }
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
+    byte[] contextInfo = new byte[0];
+    assertThrows(
+        GeneralSecurityException.class, () -> hybridDecrypt.decrypt(ciphertext, contextInfo));
   }
 
   @Test
@@ -185,31 +170,25 @@ public class WebPushHybridDecryptTest {
             .withRecipientPrivateKey(uaPrivateKey)
             .build();
     byte[] plaintext = Random.randBytes(20);
-    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, null /* contextInfo */);
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
 
     // Flipping bits.
     for (int b = 0; b < ciphertext.length; b++) {
       for (int bit = 0; bit < 8; bit++) {
         byte[] modified = Arrays.copyOf(ciphertext, ciphertext.length);
         modified[b] ^= (byte) (1 << bit);
-        try {
-          byte[] unused = hybridDecrypt.decrypt(modified, null /* contextInfo */);
-          fail("Decrypting modified ciphertext should fail");
-        } catch (GeneralSecurityException ex) {
-          // This is expected.
-        }
+        assertThrows(
+            GeneralSecurityException.class,
+            () -> hybridDecrypt.decrypt(modified, /* contextInfo= */ null));
       }
     }
 
     // Truncate the message.
     for (int length = 0; length < ciphertext.length; length++) {
       byte[] modified = Arrays.copyOf(ciphertext, length);
-      try {
-        byte[] unused = hybridDecrypt.decrypt(modified, null /* contextInfo */);
-        fail("Decrypting modified ciphertext should fail");
-      } catch (GeneralSecurityException ex) {
-        // This is expected.
-      }
+      assertThrows(
+          GeneralSecurityException.class,
+          () -> hybridDecrypt.decrypt(modified, /* contextInfo= */ null));
     }
   }
 
@@ -235,10 +214,254 @@ public class WebPushHybridDecryptTest {
             .withRecipientPrivateKey(uaPrivateKey)
             .build();
     byte[] plaintext = Random.randBytes(plaintextSize);
-    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, null /* contextInfo */);
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
 
     assertEquals(
         ciphertext.length, plaintext.length + paddingSize + WebPushConstants.CIPHERTEXT_OVERHEAD);
-    assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, null /* contextInfo */));
+    assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
+  }
+
+  @Test
+  public void testDecrypt_largePayloadWithDefaultDecryptor_fails() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPrivateKey uaPrivateKey = (ECPrivateKey) uaKeyPair.getPrivate();
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    byte[] plaintext = Random.randBytes(10 * 1024);
+    HybridEncrypt hybridEncrypt =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(20 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .build();
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
+
+    HybridDecrypt hybridDecrypt =
+        new WebPushHybridDecrypt.Builder()
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .withRecipientPrivateKey(uaPrivateKey)
+            .build();
+
+    assertThrows(
+        GeneralSecurityException.class,
+        () -> hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
+  }
+
+  @Test
+  public void testDecrypt_largePayloadWithMaxCiphertextSize_succeeds() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPrivateKey uaPrivateKey = (ECPrivateKey) uaKeyPair.getPrivate();
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    // 100 KB payload simulating large screenshot data.
+    byte[] plaintext = Random.randBytes(100 * 1024);
+    HybridEncrypt hybridEncrypt =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(200 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .build();
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
+
+    HybridDecrypt hybridDecrypt =
+        new WebPushHybridDecrypt.Builder()
+            .withMaxCiphertextSize(200 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .withRecipientPrivateKey(uaPrivateKey)
+            .build();
+
+    byte[] decrypted = hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null);
+    assertArrayEquals(plaintext, decrypted);
+  }
+
+  @Test
+  public void testDecrypt_largePayloadWithExplicitRecordSize_succeeds() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPrivateKey uaPrivateKey = (ECPrivateKey) uaKeyPair.getPrivate();
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    byte[] plaintext = Random.randBytes(50 * 1024);
+    int explicitRecordSize = 60 * 1024;
+    HybridEncrypt hybridEncrypt =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(100 * 1024)
+            .withRecordSize(explicitRecordSize)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .build();
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
+
+    HybridDecrypt hybridDecrypt =
+        new WebPushHybridDecrypt.Builder()
+            .withMaxCiphertextSize(100 * 1024)
+            .withRecordSize(explicitRecordSize)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .withRecipientPrivateKey(uaPrivateKey)
+            .build();
+
+    byte[] decrypted = hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null);
+    assertArrayEquals(plaintext, decrypted);
+  }
+
+  @Test
+  public void testDecrypt_largePayloadWithMismatchedExplicitRecordSize_fails() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPrivateKey uaPrivateKey = (ECPrivateKey) uaKeyPair.getPrivate();
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    byte[] plaintext = Random.randBytes(50 * 1024);
+    int explicitRecordSize = 60 * 1024;
+    HybridEncrypt hybridEncrypt =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(100 * 1024)
+            .withRecordSize(explicitRecordSize)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .build();
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
+
+    HybridDecrypt hybridDecrypt =
+        new WebPushHybridDecrypt.Builder()
+            .withMaxCiphertextSize(100 * 1024)
+            .withRecordSize(explicitRecordSize + 1)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .withRecipientPrivateKey(uaPrivateKey)
+            .build();
+
+    assertThrows(
+        GeneralSecurityException.class,
+        () -> hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
+  }
+
+  @Test
+  public void testDecrypt_payloadExceedingConfiguredMaxCiphertextSize_fails() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPrivateKey uaPrivateKey = (ECPrivateKey) uaKeyPair.getPrivate();
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    byte[] plaintext = Random.randBytes(10 * 1024);
+    HybridEncrypt hybridEncrypt =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(20 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .build();
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
+
+    HybridDecrypt hybridDecrypt =
+        new WebPushHybridDecrypt.Builder()
+            .withMaxCiphertextSize(8 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .withRecipientPrivateKey(uaPrivateKey)
+            .build();
+
+    assertThrows(
+        GeneralSecurityException.class,
+        () -> hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
+  }
+
+  @Test
+  public void testDecrypt_recordSizeExceedingMaxCiphertextSize_fails() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPrivateKey uaPrivateKey = (ECPrivateKey) uaKeyPair.getPrivate();
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    byte[] plaintext = Random.randBytes(5 * 1024);
+    // Header record size declares 20KB, but decryptor allows only 10KB.
+    HybridEncrypt hybridEncrypt =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(20 * 1024)
+            .withRecordSize(20 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .build();
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
+
+    HybridDecrypt hybridDecrypt =
+        new WebPushHybridDecrypt.Builder()
+            .withMaxCiphertextSize(10 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .withRecipientPrivateKey(uaPrivateKey)
+            .build();
+
+    assertThrows(
+        GeneralSecurityException.class,
+        () -> hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
+  }
+
+  @Test
+  public void testDecrypt_recordSizeSmallerThanPayload_fails() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPrivateKey uaPrivateKey = (ECPrivateKey) uaKeyPair.getPrivate();
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    byte[] plaintext = Random.randBytes(50 * 1024);
+    HybridEncrypt hybridEncrypt =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(100 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .build();
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
+    // Tamper with the 4-byte record size field in the header to be smaller than the actual payload.
+    ByteBuffer.wrap(ciphertext).putInt(WebPushConstants.SALT_SIZE, 1024);
+
+    HybridDecrypt hybridDecrypt =
+        new WebPushHybridDecrypt.Builder()
+            .withMaxCiphertextSize(100 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .withRecipientPrivateKey(uaPrivateKey)
+            .build();
+
+    assertThrows(
+        GeneralSecurityException.class,
+        () -> hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
+  }
+
+  @Test
+  public void testBuilder_invalidMaxCiphertextSize_throws() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPrivateKey uaPrivateKey = (ECPrivateKey) uaKeyPair.getPrivate();
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    WebPushHybridDecrypt.Builder builder =
+        new WebPushHybridDecrypt.Builder()
+            .withMaxCiphertextSize(WebPushConstants.CIPHERTEXT_OVERHEAD - 1)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .withRecipientPrivateKey(uaPrivateKey);
+    assertThrows(IllegalArgumentException.class, () -> builder.build());
+  }
+
+  @Test
+  public void testBuilder_explicitRecordSizeExceedsMaxCiphertextSize_throws() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPrivateKey uaPrivateKey = (ECPrivateKey) uaKeyPair.getPrivate();
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    WebPushHybridDecrypt.Builder builder =
+        new WebPushHybridDecrypt.Builder()
+            .withMaxCiphertextSize(5000)
+            .withRecordSize(5001)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .withRecipientPrivateKey(uaPrivateKey);
+    assertThrows(IllegalArgumentException.class, () -> builder.build());
   }
 }

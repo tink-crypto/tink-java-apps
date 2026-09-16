@@ -18,7 +18,7 @@ package com.google.crypto.tink.apps.webpush;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
 import com.google.crypto.tink.HybridDecrypt;
 import com.google.crypto.tink.HybridEncrypt;
@@ -76,9 +76,9 @@ public class WebPushHybridEncryptTest {
     }
     for (int j = 0; j < numTests; j++) {
       byte[] plaintext = Random.randBytes(j);
-      byte[] ciphertext = hybridEncrypt.encrypt(plaintext, null /* contextInfo */);
+      byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
       assertEquals(ciphertext.length, plaintext.length + WebPushConstants.CIPHERTEXT_OVERHEAD);
-      assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, null /* contextInfo */));
+      assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
 
       // Checks that the encryption is randomized.
       ByteBuffer record = ByteBuffer.wrap(ciphertext);
@@ -134,9 +134,9 @@ public class WebPushHybridEncryptTest {
               .build();
 
       byte[] plaintext = Random.randBytes(recordSize - WebPushConstants.CIPHERTEXT_OVERHEAD);
-      byte[] ciphertext = hybridEncrypt.encrypt(plaintext, null /* contextInfo */);
+      byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
       assertEquals(ciphertext.length, plaintext.length + WebPushConstants.CIPHERTEXT_OVERHEAD);
-      assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, null /* contextInfo */));
+      assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
     }
   }
 
@@ -163,9 +163,9 @@ public class WebPushHybridEncryptTest {
     byte[] plaintext =
         Random.randBytes(
             WebPushConstants.MAX_CIPHERTEXT_SIZE - WebPushConstants.CIPHERTEXT_OVERHEAD);
-    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, null /* contextInfo */);
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
     assertEquals(ciphertext.length, plaintext.length + WebPushConstants.CIPHERTEXT_OVERHEAD);
-    assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, null /* contextInfo */));
+    assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
   }
 
   @Test
@@ -189,9 +189,9 @@ public class WebPushHybridEncryptTest {
             .withRecipientPrivateKey(uaPrivateKey)
             .build();
     byte[] plaintext = new byte[0];
-    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, null /* contextInfo */);
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
     assertEquals(ciphertext.length, plaintext.length + WebPushConstants.CIPHERTEXT_OVERHEAD);
-    assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, null /* contextInfo */));
+    assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
   }
 
   @Test
@@ -200,27 +200,19 @@ public class WebPushHybridEncryptTest {
     ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
     byte[] authSecret = Random.randBytes(16);
 
-    try {
-      new WebPushHybridEncrypt.Builder()
-          .withRecordSize(WebPushConstants.MAX_CIPHERTEXT_SIZE + 1)
-          .withAuthSecret(authSecret)
-          .withRecipientPublicKey(uaPublicKey)
-          .build();
-      fail("Expected IllegalArgumentException");
-    } catch (IllegalArgumentException ex) {
-      // expected.
-    }
+    WebPushHybridEncrypt.Builder builder =
+        new WebPushHybridEncrypt.Builder()
+            .withRecordSize(WebPushConstants.MAX_CIPHERTEXT_SIZE + 1)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey);
+    assertThrows(IllegalArgumentException.class, () -> builder.build());
 
-    try {
-      new WebPushHybridEncrypt.Builder()
-          .withRecordSize(WebPushConstants.CIPHERTEXT_OVERHEAD - 1)
-          .withAuthSecret(authSecret)
-          .withRecipientPublicKey(uaPublicKey)
-          .build();
-      fail("Expected IllegalArgumentException");
-    } catch (IllegalArgumentException ex) {
-      // expected.
-    }
+    WebPushHybridEncrypt.Builder builder2 =
+        new WebPushHybridEncrypt.Builder()
+            .withRecordSize(WebPushConstants.CIPHERTEXT_OVERHEAD - 1)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey);
+    assertThrows(IllegalArgumentException.class, () -> builder2.build());
   }
 
   @Test
@@ -237,11 +229,82 @@ public class WebPushHybridEncryptTest {
     byte[] plaintext = Random.randBytes(20);
     byte[] contextInfo = new byte[0];
 
-    try {
-      byte[] unusedCiphertext = hybridEncrypt.encrypt(plaintext, contextInfo);
-      fail("Expected GeneralSecurityException");
-    } catch (GeneralSecurityException ex) {
-      // expected;
-    }
+    assertThrows(
+        GeneralSecurityException.class, () -> hybridEncrypt.encrypt(plaintext, contextInfo));
+  }
+
+  @Test
+  public void testEncrypt_largePayloadWithMaxCiphertextSize_succeeds() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPrivateKey uaPrivateKey = (ECPrivateKey) uaKeyPair.getPrivate();
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    byte[] plaintext = Random.randBytes(100 * 1024);
+    HybridEncrypt hybridEncrypt =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(200 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .build();
+    HybridDecrypt hybridDecrypt =
+        new WebPushHybridDecrypt.Builder()
+            .withMaxCiphertextSize(200 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .withRecipientPrivateKey(uaPrivateKey)
+            .build();
+
+    byte[] ciphertext = hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null);
+    assertEquals(ciphertext.length, plaintext.length + WebPushConstants.CIPHERTEXT_OVERHEAD);
+    assertArrayEquals(plaintext, hybridDecrypt.decrypt(ciphertext, /* contextInfo= */ null));
+  }
+
+  @Test
+  public void testEncrypt_plaintextExceedingMaxCiphertextSize_throws() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    byte[] plaintext = Random.randBytes(10 * 1024);
+    HybridEncrypt hybridEncrypt =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(8 * 1024)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey)
+            .build();
+
+    assertThrows(
+        GeneralSecurityException.class,
+        () -> hybridEncrypt.encrypt(plaintext, /* contextInfo= */ null));
+  }
+
+  @Test
+  public void testBuilder_invalidMaxCiphertextSize_throws() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    WebPushHybridEncrypt.Builder builder =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(WebPushConstants.CIPHERTEXT_OVERHEAD - 1)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey);
+    assertThrows(IllegalArgumentException.class, () -> builder.build());
+  }
+
+  @Test
+  public void testBuilder_explicitRecordSizeExceedsMaxCiphertextSize_throws() throws Exception {
+    KeyPair uaKeyPair = EllipticCurves.generateKeyPair(WebPushConstants.NIST_P256_CURVE_TYPE);
+    ECPublicKey uaPublicKey = (ECPublicKey) uaKeyPair.getPublic();
+    byte[] authSecret = Random.randBytes(16);
+
+    WebPushHybridEncrypt.Builder builder =
+        new WebPushHybridEncrypt.Builder()
+            .withMaxCiphertextSize(5000)
+            .withRecordSize(5001)
+            .withAuthSecret(authSecret)
+            .withRecipientPublicKey(uaPublicKey);
+    assertThrows(IllegalArgumentException.class, () -> builder.build());
   }
 }

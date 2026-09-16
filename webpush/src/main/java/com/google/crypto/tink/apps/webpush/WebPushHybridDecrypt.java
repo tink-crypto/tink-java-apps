@@ -87,6 +87,8 @@ public final class WebPushHybridDecrypt implements HybridDecrypt {
   private final byte[] recipientPublicKey;
   private final byte[] authSecret;
   private final int recordSize;
+  private final boolean isRecordSizeExplicitlySet;
+  private final int maxCiphertextSize;
 
   private WebPushHybridDecrypt(Builder builder) throws GeneralSecurityException {
     if (builder.recipientPrivateKey == null) {
@@ -111,16 +113,38 @@ public final class WebPushHybridDecrypt implements HybridDecrypt {
     }
     this.authSecret = builder.authSecret;
 
-    if (builder.recordSize < WebPushConstants.CIPHERTEXT_OVERHEAD
-        || builder.recordSize > WebPushConstants.MAX_CIPHERTEXT_SIZE) {
+    if (builder.maxCiphertextSize < WebPushConstants.CIPHERTEXT_OVERHEAD) {
       throw new IllegalArgumentException(
           String.format(
-              "invalid record size (%s); must be a number between [%s, %s]",
-              builder.recordSize,
-              WebPushConstants.CIPHERTEXT_OVERHEAD,
-              WebPushConstants.MAX_CIPHERTEXT_SIZE));
+              "invalid max ciphertext size (%s); must be at least %s",
+              builder.maxCiphertextSize, WebPushConstants.CIPHERTEXT_OVERHEAD));
     }
-    this.recordSize = builder.recordSize;
+    this.maxCiphertextSize = builder.maxCiphertextSize;
+
+    if (builder.isRecordSizeExplicitlySet) {
+      if (builder.recordSize < WebPushConstants.CIPHERTEXT_OVERHEAD
+          || builder.recordSize > builder.maxCiphertextSize) {
+        throw new IllegalArgumentException(
+            String.format(
+                "invalid record size (%s); must be a number between [%s, %s]",
+                builder.recordSize,
+                WebPushConstants.CIPHERTEXT_OVERHEAD,
+                builder.maxCiphertextSize));
+      }
+      this.recordSize = builder.recordSize;
+    } else {
+      if (builder.recordSize < WebPushConstants.CIPHERTEXT_OVERHEAD
+          || builder.recordSize > WebPushConstants.MAX_CIPHERTEXT_SIZE) {
+        throw new IllegalArgumentException(
+            String.format(
+                "invalid record size (%s); must be a number between [%s, %s]",
+                builder.recordSize,
+                WebPushConstants.CIPHERTEXT_OVERHEAD,
+                WebPushConstants.MAX_CIPHERTEXT_SIZE));
+      }
+      this.recordSize = builder.recordSize;
+    }
+    this.isRecordSizeExplicitlySet = builder.isRecordSizeExplicitlySet;
   }
 
   /**
@@ -133,8 +157,27 @@ public final class WebPushHybridDecrypt implements HybridDecrypt {
     private byte[] recipientPublicKey = null;
     private byte[] authSecret = null;
     private int recordSize = WebPushConstants.MAX_CIPHERTEXT_SIZE;
+    private boolean isRecordSizeExplicitlySet = false;
+    private int maxCiphertextSize = WebPushConstants.MAX_CIPHERTEXT_SIZE;
 
     public Builder() {}
+
+    /**
+     * Sets the maximum ciphertext size in bytes that this decryptor will accept.
+     *
+     * <p>By default, this is 4096 bytes, adhering to the push service payload limit described in
+     * RFC 8291 Section 4. Callers using WebPush encryption over direct transport (such as direct
+     * HTTP or storage) where payloads exceed push gateway limits can increase this limit.
+     *
+     * @param val the maximum ciphertext size in bytes; must be at least {@link
+     *     WebPushConstants#CIPHERTEXT_OVERHEAD}
+     * @return this builder
+     */
+    @CanIgnoreReturnValue
+    public Builder withMaxCiphertextSize(int val) {
+      maxCiphertextSize = val;
+      return this;
+    }
 
     /**
      * Sets the record size.
@@ -142,11 +185,14 @@ public final class WebPushHybridDecrypt implements HybridDecrypt {
      * <p>If set, this value must match the record size set with {@link
      * WebPushHybridEncrypt.Builder#withRecordSize}.
      *
-     * <p>If not set, a record size of 4096 bytes is used. This value should work for most users.
+     * <p>If not set, a record size of 4096 bytes is used when {@link #withMaxCiphertextSize} is at
+     * its default (4096 bytes). When {@link #withMaxCiphertextSize} has been increased, the record
+     * size in the ciphertext header will be dynamically accepted up to the configured maximum.
      */
     @CanIgnoreReturnValue
     public Builder withRecordSize(int val) {
       recordSize = val;
+      isRecordSizeExplicitlySet = true;
       return this;
     }
 
@@ -218,7 +264,7 @@ public final class WebPushHybridDecrypt implements HybridDecrypt {
 
     // A push service is not required to support more than 4096 octets of
     // payload body. See https://tools.ietf.org/html/rfc8291#section-4.0.
-    if (ciphertext.length > WebPushConstants.MAX_CIPHERTEXT_SIZE) {
+    if (ciphertext.length > maxCiphertextSize) {
       throw new GeneralSecurityException("ciphertext too long");
     }
 
@@ -228,9 +274,15 @@ public final class WebPushHybridDecrypt implements HybridDecrypt {
     record.get(salt);
 
     int recordSize = record.getInt();
-    if (recordSize != this.recordSize
-        || recordSize < ciphertext.length
-        || recordSize > WebPushConstants.MAX_CIPHERTEXT_SIZE) {
+    boolean recordSizeMismatch =
+        isRecordSizeExplicitlySet
+            ? recordSize != this.recordSize
+            : (maxCiphertextSize == WebPushConstants.MAX_CIPHERTEXT_SIZE
+                && recordSize != this.recordSize);
+    if (recordSizeMismatch
+        || recordSize < (ciphertext.length - WebPushConstants.CONTENT_CODING_HEADER_SIZE)
+        || recordSize > maxCiphertextSize
+        || recordSize < WebPushConstants.CIPHERTEXT_OVERHEAD) {
       throw new GeneralSecurityException("invalid record size: " + recordSize);
     }
 

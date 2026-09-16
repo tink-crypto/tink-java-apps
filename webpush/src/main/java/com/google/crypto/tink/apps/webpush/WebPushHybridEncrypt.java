@@ -106,7 +106,34 @@ public final class WebPushHybridEncrypt implements HybridEncrypt {
           "auth secret must have " + WebPushConstants.AUTH_SECRET_SIZE + " bytes");
     }
     this.authSecret = builder.authSecret;
-    this.recordSize = builder.recordSize;
+
+    if (builder.maxCiphertextSize < WebPushConstants.CIPHERTEXT_OVERHEAD) {
+      throw new IllegalArgumentException(
+          String.format(
+              "invalid max ciphertext size (%s); must be at least %s",
+              builder.maxCiphertextSize, WebPushConstants.CIPHERTEXT_OVERHEAD));
+    }
+
+    int effectiveRecordSize =
+        builder.isRecordSizeExplicitlySet ? builder.recordSize : builder.maxCiphertextSize;
+    if (effectiveRecordSize < WebPushConstants.CIPHERTEXT_OVERHEAD
+        || effectiveRecordSize > builder.maxCiphertextSize) {
+      throw new IllegalArgumentException(
+          String.format(
+              "invalid record size (%s); must be a number between [%s, %s]",
+              effectiveRecordSize,
+              WebPushConstants.CIPHERTEXT_OVERHEAD,
+              builder.maxCiphertextSize));
+    }
+    this.recordSize = effectiveRecordSize;
+
+    if (builder.paddingSize < 0
+        || builder.paddingSize > this.recordSize - WebPushConstants.CIPHERTEXT_OVERHEAD) {
+      throw new IllegalArgumentException(
+          String.format(
+              "invalid padding size (%s); must be a number between [%s, %s]",
+              builder.paddingSize, 0, this.recordSize - WebPushConstants.CIPHERTEXT_OVERHEAD));
+    }
     this.paddingSize = builder.paddingSize;
   }
 
@@ -120,49 +147,52 @@ public final class WebPushHybridEncrypt implements HybridEncrypt {
     private ECPoint recipientPublicPoint = null;
     private byte[] authSecret = null;
     private int recordSize = WebPushConstants.MAX_CIPHERTEXT_SIZE;
+    private boolean isRecordSizeExplicitlySet = false;
+    private int maxCiphertextSize = WebPushConstants.MAX_CIPHERTEXT_SIZE;
     private int paddingSize = WebPushConstants.DEFAULT_PADDING_SIZE;
 
     public Builder() {}
 
     /**
+     * Sets the maximum ciphertext size in bytes that this encryptor will produce.
+     *
+     * <p>By default, this is 4096 bytes, adhering to the push service payload limit described in
+     * RFC 8291 Section 4. Callers using WebPush encryption over direct transport (such as direct
+     * HTTP or storage) where payloads exceed push gateway limits can increase this limit.
+     *
+     * @param val the maximum ciphertext size in bytes; must be at least {@link
+     *     WebPushConstants#CIPHERTEXT_OVERHEAD}
+     * @return this builder
+     */
+    @CanIgnoreReturnValue
+    public Builder withMaxCiphertextSize(int val) {
+      maxCiphertextSize = val;
+      return this;
+    }
+
+    /**
      * Sets the record size.
      *
      * <p>If set, this value must match the record size set with {@link
-     * WebPushHybridEncrypt.Builder#withRecordSize}.
+     * WebPushHybridDecrypt.Builder#withRecordSize}.
      *
-     * <p>If not set, a record size of 4096 bytes is used. This value should work for most users.
+     * <p>If not set, a record size equal to {@link #withMaxCiphertextSize} (default 4096 bytes) is
+     * used. This value should work for most users.
      */
     @CanIgnoreReturnValue
     public Builder withRecordSize(int val) {
-      if (val < WebPushConstants.CIPHERTEXT_OVERHEAD
-          || val > WebPushConstants.MAX_CIPHERTEXT_SIZE) {
-        throw new IllegalArgumentException(
-            String.format(
-                "invalid record size (%s); must be a number between [%s, %s]",
-                val, WebPushConstants.CIPHERTEXT_OVERHEAD, WebPushConstants.MAX_CIPHERTEXT_SIZE));
-      }
-
       recordSize = val;
+      isRecordSizeExplicitlySet = true;
       return this;
     }
 
     /**
      * Sets the padding size which is default to 0.
      *
-     * <p>The padding size cannot be larger than
+     * <p>The padding size cannot be larger than {@code recordSize - CIPHERTEXT_OVERHEAD}.
      */
     @CanIgnoreReturnValue
     public Builder withPaddingSize(int val) {
-      if (val < 0
-          || val > WebPushConstants.MAX_CIPHERTEXT_SIZE - WebPushConstants.CIPHERTEXT_OVERHEAD) {
-        throw new IllegalArgumentException(
-            String.format(
-                "invalid padding size (%s); must be a number between [%s, %s]",
-                val,
-                0,
-                WebPushConstants.MAX_CIPHERTEXT_SIZE - WebPushConstants.CIPHERTEXT_OVERHEAD));
-      }
-
       paddingSize = val;
       return this;
     }
