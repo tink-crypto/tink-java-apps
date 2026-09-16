@@ -27,7 +27,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
+var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -201,26 +201,33 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="WebPushHybridEncrypt.Builder.html" title="class in com.google.crypto.tink.apps.webpush">WebPushHybridEncrypt.Builder</a></code></td>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withMaxCiphertextSize(int)">withMaxCiphertextSize</a></span>&#8203;(int&nbsp;val)</code></th>
+<td class="colLast">
+<div class="block">Sets the maximum ciphertext size in bytes that this encryptor will produce.</div>
+</td>
+</tr>
+<tr id="i3" class="rowColor">
+<td class="colFirst"><code><a href="WebPushHybridEncrypt.Builder.html" title="class in com.google.crypto.tink.apps.webpush">WebPushHybridEncrypt.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withPaddingSize(int)">withPaddingSize</a></span>&#8203;(int&nbsp;val)</code></th>
 <td class="colLast">
 <div class="block">Sets the padding size which is default to 0.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="WebPushHybridEncrypt.Builder.html" title="class in com.google.crypto.tink.apps.webpush">WebPushHybridEncrypt.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withRecipientPublicKey(byte%5B%5D)">withRecipientPublicKey</a></span>&#8203;(byte[]&nbsp;val)</code></th>
 <td class="colLast">
 <div class="block">Sets the public key of the recipient.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="WebPushHybridEncrypt.Builder.html" title="class in com.google.crypto.tink.apps.webpush">WebPushHybridEncrypt.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withRecipientPublicKey(java.security.interfaces.ECPublicKey)">withRecipientPublicKey</a></span>&#8203;(java.security.interfaces.ECPublicKey&nbsp;val)</code></th>
 <td class="colLast">
 <div class="block">Sets the public key of the recipient.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="WebPushHybridEncrypt.Builder.html" title="class in com.google.crypto.tink.apps.webpush">WebPushHybridEncrypt.Builder</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#withRecordSize(int)">withRecordSize</a></span>&#8203;(int&nbsp;val)</code></th>
 <td class="colLast">
@@ -270,6 +277,27 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a id="withMaxCiphertextSize(int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>withMaxCiphertextSize</h4>
+<pre class="methodSignature">@CanIgnoreReturnValue
+public&nbsp;<a href="WebPushHybridEncrypt.Builder.html" title="class in com.google.crypto.tink.apps.webpush">WebPushHybridEncrypt.Builder</a>&nbsp;withMaxCiphertextSize&#8203;(int&nbsp;val)</pre>
+<div class="block">Sets the maximum ciphertext size in bytes that this encryptor will produce.
+
+ <p>By default, this is 4096 bytes, adhering to the push service payload limit described in
+ RFC 8291 Section 4. Callers using WebPush encryption over direct transport (such as direct
+ HTTP or storage) where payloads exceed push gateway limits can increase this limit.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>val</code> - the maximum ciphertext size in bytes; must be at least <code>WebPushConstants.CIPHERTEXT_OVERHEAD</code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>this builder</dd>
+</dl>
+</li>
+</ul>
 <a id="withRecordSize(int)">
 <!--   -->
 </a>
@@ -280,9 +308,10 @@ extends java.lang.Object</pre>
 public&nbsp;<a href="WebPushHybridEncrypt.Builder.html" title="class in com.google.crypto.tink.apps.webpush">WebPushHybridEncrypt.Builder</a>&nbsp;withRecordSize&#8203;(int&nbsp;val)</pre>
 <div class="block">Sets the record size.
 
- <p>If set, this value must match the record size set with <a href="#withRecordSize(int)"><code>withRecordSize(int)</code></a>.
+ <p>If set, this value must match the record size set with <a href="WebPushHybridDecrypt.Builder.html#withRecordSize(int)"><code>WebPushHybridDecrypt.Builder.withRecordSize(int)</code></a>.
 
- <p>If not set, a record size of 4096 bytes is used. This value should work for most users.</div>
+ <p>If not set, a record size equal to <a href="#withMaxCiphertextSize(int)"><code>withMaxCiphertextSize(int)</code></a> (default 4096 bytes) is
+ used. This value should work for most users.</div>
 </li>
 </ul>
 <a id="withPaddingSize(int)">
@@ -295,7 +324,7 @@ public&nbsp;<a href="WebPushHybridEncrypt.Builder.html" title="class in com.goog
 public&nbsp;<a href="WebPushHybridEncrypt.Builder.html" title="class in com.google.crypto.tink.apps.webpush">WebPushHybridEncrypt.Builder</a>&nbsp;withPaddingSize&#8203;(int&nbsp;val)</pre>
 <div class="block">Sets the padding size which is default to 0.
 
- <p>The padding size cannot be larger than</div>
+ <p>The padding size cannot be larger than <code>recordSize - CIPHERTEXT_OVERHEAD</code>.</div>
 </li>
 </ul>
 <a id="withAuthSecret(byte[])">
