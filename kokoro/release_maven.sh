@@ -113,7 +113,7 @@ readonly BASE64TOKEN="$(cat ${BASE64TOKENFILE})"
 declare -ar APPS=(paymentmethodtoken rewardedads webpush)
 
 for app in "${APPS[@]}" ; do
-  curl --request POST \
+  curl --fail --request POST \
     --header "Authorization: Bearer ${BASE64TOKEN}" \
     --form bundle=@kokoro_upload_dir/release/"${app}"-release-bundle.zip \
     https://central.sonatype.com/api/v1/publisher/upload
