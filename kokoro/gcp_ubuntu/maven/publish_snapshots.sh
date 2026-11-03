@@ -25,6 +25,12 @@
 #
 #   CONTAINER_IMAGE="us-docker.pkg.dev/tink-test-infrastructure/tink-ci-images/linux-tink-java-base:latest" \
 #     sh ./kokoro/gcp_ubuntu/maven/publish_snapshots.sh
+
+# Unique hex string of length 20
+echo "================================================================================"
+echo "Tink Script ID: 2291d70973697d7a7769 (to quickly find the script from logs)"
+echo "================================================================================"
+
 set -eEuo pipefail
 
 IS_KOKORO="false"
