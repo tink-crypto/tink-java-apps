@@ -70,15 +70,17 @@ CACHE_FLAGS=()
 if [[ -n "${BAZEL_REMOTE_CACHE_NAME:-}" ]]; then
   CACHE_FLAGS+=("--remote_cache=https://storage.googleapis.com/${BAZEL_REMOTE_CACHE_NAME}")
   CACHE_FLAGS+=("--google_credentials=$(realpath ./cache_key)")
+  # Avoid downloading cached intermediate/top-level build outputs unless needed
+  # by a local action.
+  CACHE_FLAGS+=("--remote_download_minimal")
 fi
 readonly CACHE_FLAGS
 
 cat .bazelrc
 
-echo "---------- BUILDING MAIN"
-time bazelisk build "${CACHE_FLAGS[@]}" -- ...
-echo "---------- TESTING MAIN"
-time bazelisk test "${CACHE_FLAGS[@]}" -- ...
+# --nobuild_tests_only ensures all non-test targets in '...' are built too.
+echo "---------- BUILDING AND TESTING MAIN"
+time bazelisk test --nobuild_tests_only "${CACHE_FLAGS[@]}" -- ...
 
 EOF
 ### ======================================================= END: _do_run_test.sh
